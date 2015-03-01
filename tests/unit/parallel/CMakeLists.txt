@@ -64,6 +64,7 @@ set(tests
     uninitialized_copyn
     uninitialized_fill
     uninitialized_filln
+    unique_copy
    )
 
 set(task_region_FLAGS DEPENDENCIES iostreams_component)
