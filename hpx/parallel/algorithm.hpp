@@ -21,6 +21,8 @@
 #include <hpx/parallel/algorithms/find.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
+#include <hpx/parallel/algorithms/is_partitioned.hpp>
+#include <hpx/parallel/algorithms/is_sorted.hpp>
 #include <hpx/parallel/algorithms/lexicographical_compare.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
@@ -34,6 +36,5 @@
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
-#include <hpx/parallel/algorithms/is_partitioned.hpp>
-#include <hpx/parallel/algorithms/is_sorted.hpp>
+#include <hpx/parallel/algorithms/unique.hpp>
 #endif
