@@ -60,30 +60,31 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 if (count < 1)
                     return result::get(std::move(dest));
+                *dest = first;
 
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter, char*>
                     zip_iterator1;
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator2;
-                boost::shared_array<char> flags(new char[count]);
+                boost::shared_array<char> flags(new char[count-1]);
                 std::size_t init = 1;
-                FwdIter prev = first++;
+                FwdIter lead = first;
+                FwdIter prev = lead++;
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
                 return util::scan_partitioner<ExPolicy, Iter,
                 std::size_t>::call(
                     policy,
-                    make_zip_iterator(prev, first, flags.get()),
+                    make_zip_iterator(prev, lead, flags.get()),
                     count - 1,
                     init,
-
                     // Flag the duplicates
                     [pred](zip_iterator1 part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         std::size_t curr = 0;
                         util::loop_n(part_begin, part_size,
-                            [&pred, &curr, &prev](zip_iterator d) mutable
+                            [&pred, &curr, &prev](zip_iterator1 d) mutable
                             {
                                 get<2>(*d) = pred(get<0>(*d), get<1>(*d));
                                 curr += !get<2>(*d);
@@ -105,22 +106,15 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return util::partitioner<ExPolicy, Iter, void>::
                         call_with_data(
                             policy,
-                            hpx::util::make_zip_iterator(first, flags.get()),
+                            hpx::util::make_zip_iterator(++first, flags.get()),
                             count - 1,
-                            [dest, first](hpx::shared_future<std::size_t>&& pos,
+                            [dest](hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator2 part_begin,std::size_t part_count)
                             {
                                 Iter iter = dest;
-                                if (get<0>(*part_begin) == first){
-                                    part_count += 1;
-                                }
-                                else
-                                {
-                                    ++part_begin;
-                                    std::advance(iter, pos.get());
-                                }
+                                std::advance(iter, pos.get());
                                 util::loop_n(part_begin, part_count,
-                                [&iter](zip_iterator d)
+                                [&iter](zip_iterator2 d)
                                 {
                                     if(!hpx::util::get<1>(*d))
                                         *iter++ = hpx::util::get<0>(*d);
