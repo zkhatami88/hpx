@@ -60,7 +60,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 if (count < 1)
                     return result::get(std::move(dest));
-                *dest = first;
+                *dest = *first;
 
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter, char*>
                     zip_iterator1;
@@ -84,7 +84,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     {
                         std::size_t curr = 0;
                         util::loop_n(part_begin, part_size,
-                            [&pred, &curr, &prev](zip_iterator1 d) mutable
+                            [&pred, &curr](zip_iterator1 d) mutable
                             {
                                 get<2>(*d) = pred(get<0>(*d), get<1>(*d));
                                 curr += !get<2>(*d);
