@@ -5,6 +5,7 @@
 
 /// \file parallel/algorithms/copy.hpp
 
+
 #if !defined(HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_135300)
 #define HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_135300
 
@@ -75,6 +76,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     make_zip_iterator(prev, first, flags.get()),
                     count - 1,
                     init,
+
                     // Flag the duplicates
                     [pred](zip_iterator1 part_begin, std::size_t part_size)
                         -> std::size_t
