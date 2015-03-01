@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM)
-#define HPX_PARALLEL_DETAIL_COPY_MAY_30_2014_0317PM
+#if !defined(HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_1353)
+#define HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_1353
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -55,6 +55,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
                 Iter dest, Pred && pred)
             {
+                typedef detail::algorithm_result<ExPolicy, Iter> result;
                 std::size_t count = std::distance(first, last);
                 if (count < 1)
                     return result::get(std::move(dest));
@@ -72,13 +73,13 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     count - 1,
                     init,
                     // flag the duplicates
-                    [f](zip_iterator part_begin, std::size_t part_size)
+                    [pred](zip_iterator part_begin, std::size_t part_size)
                         -> std::size_t
                     {
                         FwdIter prev = get<0>(part_begin++);
                         std::size_t curr = 0;
                         util::loop_n(part_begin, part_size,
-                            [&f, &curr, &prev](zip_iterator d) mutable
+                            [&pred, &curr, &prev](zip_iterator d) mutable
                             {
                                 get<1>(*d) = pred(prev++, get<0>(*d));
                                 curr += !get<1>(*d);
@@ -102,7 +103,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             policy,
                             hpx::util::make_zip_iterator(first, flags.get()),
                             count,
-                            [dest](hpx::shared_future<std::size_t>&& pos,
+                            [dest, first](hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator part_begin, std::size_t part_count)
                             {
                                 if(get<0>(*part_begin) == first)
@@ -129,6 +130,8 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                             chunk_sizes,
                             std::move(r)
                         );
+                    }
+                );
             }
         };
         /// \endcond
@@ -278,7 +281,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
         return detail::unique_copy<OutIter>().call(
             std::forward<ExPolicy>(policy), is_seq(),
-            first, last, dest, std::equal<value_type>());
+            first, last, dest, std::equal_to<value_type>());
     }
 }}}
 

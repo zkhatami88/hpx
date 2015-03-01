@@ -12,10 +12,11 @@
 
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    using hpx::parallel;
+    using namespace hpx::parallel;
     std::vector<int> a{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3};
-    std::vector<int> b;
-    hpx::future f = unique_copy(a.begin(), a.end(), back_inserter(b));
+    std::vector<int> b(a.size());
+    hpx::future<std::vector<int>::iterator>
+        f = unique_copy(par(task), a.begin(), a.end(), b.begin());
     f.get();
     for(int z : b) std::cout << z << " "; std::cout << std::endl;
     return hpx::finalize();
