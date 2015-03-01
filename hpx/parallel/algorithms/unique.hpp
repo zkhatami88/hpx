@@ -5,8 +5,8 @@
 
 /// \file parallel/algorithms/copy.hpp
 
-#if !defined(HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_1353)
-#define HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_1353
+#if !defined(HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_135300)
+#define HPX_PARALLEL_DETAIL_UNIQUE_MARCH_1_2015_135300
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/execution_policy.hpp>
