@@ -6,6 +6,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/parallel_unique.hpp>
+#include <hpx/include/parallel_partition.hpp>
+#include <hpx/include/parallel_copy.hpp>
+#include <hpx/include/parallel_scan.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
 #include "test_utils.hpp"
@@ -13,11 +16,32 @@
 int hpx_main(boost::program_options::variables_map& vm)
 {
     using namespace hpx::parallel;
-    std::vector<int> a{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3};
+
+//HPX_ASSERT(workitems.size() == 2) from scan_partitioner
+    std::vector<int> a{1,1};
     std::vector<int> b(a.size());
-    hpx::future<std::vector<int>::iterator>
-        f = unique_copy(par(task), a.begin(), a.end(), b.begin());
-    f.get();
+    exclusive_scan(par(task), a.begin(), a.end(), b.begin(), 100);
+//
+
+/*
+//    for(int i = 0; i < 5000; ++i){ a.push_back(i); a.push_back(i); }
+//        auto f2 = copy_if(par(task), a.begin(), a.end(), b.begin(), [](int qwe){ return true; });
+//    auto f1 = unique_copy(par(task), a.begin(), a.end(), b.begin());
+//    if (f1.get() == b.begin() && f2.get() == b.begin()) std::cout << "GOOD TO GO!\n";
+//    if (f2.get() == b.begin()) std::cout << "copy_if is good!\n";
+//    if (f1.get() == b.begin()) std::cout << "unique_copy good at zero length!\n";
+
+    std::vector<int> a;
+    for(int i = 0; i < 5000; ++i){ a.push_back(i); }
+    std::vector<int> a_true(a.size()), a_false(a.size());
+    auto f = partition(par(task), a.begin(), a.end(),
+        a_true.begin(), a_false.begin(),
+        [](int asd){ return asd % 2 == 0; });
+    f.wait();
+
+    for(int z : a_true) std::cout << z << " "; std::cout << std::endl;
+    for(int z : a_false) std::cout << z << " "; std::cout << std::endl;
+*/
     for(int z : b) std::cout << z << " "; std::cout << std::endl;
     return hpx::finalize();
 }

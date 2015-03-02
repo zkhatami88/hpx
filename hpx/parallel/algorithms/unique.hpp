@@ -60,22 +60,21 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 std::size_t count = std::distance(first, last);
                 if (count < 1)
                     return result::get(std::move(dest));
-                *dest = *first;
+                FwdIter prev = first;
+                *dest = *first++;
 
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter, char*>
                     zip_iterator1;
                 typedef hpx::util::zip_iterator<FwdIter, char*> zip_iterator2;
                 boost::shared_array<char> flags(new char[count-1]);
                 std::size_t init = 1;
-                FwdIter lead = first;
-                FwdIter prev = lead++;
 
                 using hpx::util::get;
                 using hpx::util::make_zip_iterator;
                 return util::scan_partitioner<ExPolicy, Iter,
                 std::size_t>::call(
                     policy,
-                    make_zip_iterator(prev, lead, flags.get()),
+                    make_zip_iterator(prev, first, flags.get()),
                     count - 1,
                     init,
                     // Flag the duplicates
@@ -106,7 +105,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         return util::partitioner<ExPolicy, Iter, void>::
                         call_with_data(
                             policy,
-                            hpx::util::make_zip_iterator(++first, flags.get()),
+                            hpx::util::make_zip_iterator(first, flags.get()),
                             count - 1,
                             [dest](hpx::shared_future<std::size_t>&& pos,
                                 zip_iterator2 part_begin,std::size_t part_count)
