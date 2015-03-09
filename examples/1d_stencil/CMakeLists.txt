@@ -11,11 +11,14 @@ set(example_programs
     1d_stencil_2
     1d_stencil_3
     1d_stencil_4
+    1d_stencil_4_2
     1d_stencil_4_parallel
     1d_stencil_5
     1d_stencil_6
     1d_stencil_7
-    1d_stencil_8)
+    1d_stencil_8
+    1d_stencil_8_3
+    1d_stencil_8_2)
 
 if(OPENMP_FOUND)
   set(example_programs ${example_programs}

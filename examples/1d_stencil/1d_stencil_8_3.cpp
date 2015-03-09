@@ -334,15 +334,15 @@ struct stepper_server : hpx::components::simple_component_base<stepper_server>
     HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action);
 
     // receive the left-most partition from the right
-    void from_right(std::size_t t, partition p)
+    void from_right(std::size_t t, hpx::future<partition_data> p)
     {
-        right_receive_buffer_.store_received(t, std::move(p));
+        right_receive_buffer_.store_received(t, p.get());
     }
 
     // receive the right-most partition from the left
-    void from_left(std::size_t t, partition p)
+    void from_left(std::size_t t, hpx::future<partition_data> p)
     {
-        left_receive_buffer_.store_received(t, std::move(p));
+        left_receive_buffer_.store_received(t, p.get());
     }
 
     HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_right, from_right_action);
@@ -357,16 +357,16 @@ protected:
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition heat_part(partition const& left, partition const& middle,
-        partition const& right);
+    static partition heat_part(partition_data const& left, partition_data const& middle,
+        partition_data const& right);
 
     // Helper functions to receive the left and right boundary elements from
     // the neighbors.
-    partition receive_left(std::size_t t)
+    hpx::future<partition_data> receive_left(std::size_t t)
     {
         return left_receive_buffer_.receive(t);
     }
-    partition receive_right(std::size_t t)
+    hpx::future<partition_data> receive_right(std::size_t t)
     {
         return right_receive_buffer_.receive(t);
     }
@@ -375,18 +375,18 @@ protected:
     // the neighbors.
     void send_left(std::size_t t, partition p)
     {
-        hpx::apply(from_right_action(), left_.get(), t, std::move(p));
+        hpx::apply(from_right_action(), left_.get(), t, p.get_data(partition_server::left_partition));
     }
     void send_right(std::size_t t, partition p)
     {
-        hpx::apply(from_left_action(), right_.get(), t, std::move(p));
+        hpx::apply(from_left_action(), right_.get(), t, p.get_data(partition_server::right_partition));
     }
 
 private:
     hpx::shared_future<hpx::id_type> left_, right_;
     std::vector<space> U_;
-    hpx::lcos::local::receive_buffer<partition> left_receive_buffer_;
-    hpx::lcos::local::receive_buffer<partition> right_receive_buffer_;
+    hpx::lcos::local::receive_buffer<partition_data> left_receive_buffer_;
+    hpx::lcos::local::receive_buffer<partition_data> right_receive_buffer_;
 };
 
 // The macros below are necessary to generate the code required for exposing
@@ -434,52 +434,23 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 ///////////////////////////////////////////////////////////////////////////////
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
-partition stepper_server::heat_part(partition const& left,
-    partition const& middle, partition const& right)
+partition stepper_server::heat_part(partition_data const& left,
+    partition_data const& middle, partition_data const& right)
 {
     using hpx::lcos::local::dataflow;
     using hpx::util::unwrapped;
 
-    hpx::shared_future<partition_data> middle_data =
-        middle.get_data(partition_server::middle_partition);
+    std::size_t size = middle.size();
+    partition_data next(size);
 
-    hpx::future<partition_data> next_middle = middle_data.then(
-        unwrapped(
-            [middle](partition_data const& m) -> partition_data
-            {
-                // All local operations are performed once the middle data of
-                // the previous time step becomes available.
-                std::size_t size = m.size();
-                partition_data next(size);
-                for (std::size_t i = 1; i != size-1; ++i)
-                    next[i] = heat(m[i-1], m[i], m[i+1]);
-                return next;
-            }
-        )
-    );
+    next[0] = heat(left[size-1], middle[0], middle[1]);
 
-    return dataflow(
-        hpx::launch::async,
-        unwrapped(
-            [left, middle, right](partition_data next, partition_data const& l,
-                partition_data const& m, partition_data const& r) -> partition
-            {
-                // Calculate the missing boundary elements once the
-                // corresponding data has become available.
-                std::size_t size = m.size();
-                next[0] = heat(l[size-1], m[0], m[1]);
-                next[size-1] = heat(m[size-2], m[size-1], r[0]);
+    for (std::size_t i = 1; i != size-1; ++i)
+        next[i] = heat(middle[i-1], middle[i], middle[i+1]);
 
-                // The new partition_data will be allocated on the same locality
-                // as 'middle'.
-                return partition(middle.get_gid(), next);
-            }
-        ),
-        std::move(next_middle),
-        left.get_data(partition_server::left_partition),
-        middle_data,
-        right.get_data(partition_server::right_partition)
-    );
+    next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+
+    return partition(hpx::find_here(), next);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -501,6 +472,8 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
     for (std::size_t i = 0; i != local_np; ++i)
         U_[0][i] = partition(here, nx, double(i));
 
+    auto Op = unwrapped(&stepper_server::heat_part);
+
     // send initial values to neighbors
     send_left(0, U_[0][0]);
     send_right(0, U_[0][local_np-1]);
@@ -514,8 +487,8 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         if (local_np == 1)
         {
             next[0] = dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    receive_left(t), current[0], receive_right(t)
+                    hpx::launch::async, Op,
+                    receive_left(t), current[0].get_data(partition_server::middle_partition), receive_right(t)
                 );
 
             // send to left and right if not last time step
@@ -528,8 +501,8 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
         else
         {
             next[0] = dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    receive_left(t), current[0], current[1]
+                    hpx::launch::async, Op,
+                    receive_left(t), current[0].get_data(partition_server::middle_partition), current[1].get_data(partition_server::middle_partition)
                 );
 
             // send to left if not last time step
@@ -538,14 +511,14 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
             for (std::size_t i = 1; i != local_np-1; ++i)
             {
                 next[i] = dataflow(
-                        hpx::launch::async, &stepper_server::heat_part,
-                        current[i-1], current[i], current[i+1]
+                        hpx::launch::async, Op,
+                        current[i-1].get_data(partition_server::middle_partition), current[i].get_data(partition_server::middle_partition), current[i+1].get_data(partition_server::middle_partition)
                     );
             }
 
             next[local_np-1] = dataflow(
-                    hpx::launch::async, &stepper_server::heat_part,
-                    current[local_np-2], current[local_np-1], receive_right(t)
+                    hpx::launch::async, Op,
+                    current[local_np-2].get_data(partition_server::middle_partition), current[local_np-1].get_data(partition_server::middle_partition), receive_right(t)
                 );
 
             // send to right if not last time step

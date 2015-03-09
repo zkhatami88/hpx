@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
+//  Copyright (c) 2015 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +17,6 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-
-#include <hpx/include/parallel_algorithm.hpp>
-#include <hpx/include/parallel_numeric.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include "print_time_results.hpp"
 
@@ -44,90 +40,17 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Use a special allocator for the partition data to remove a major contention
-// point - the constant allocation and deallocation of the data arrays.
-template <typename T>
-struct partition_allocator
-{
-private:
-    typedef hpx::lcos::local::spinlock mutex_type;
-
-public:
-    partition_allocator(std::size_t max_size = std::size_t(-1))
-      : max_size_(max_size)
-    {
-    }
-
-    ~partition_allocator()
-    {
-        mutex_type::scoped_lock l(mtx_);
-        while (!heap_.empty())
-        {
-            T* p = heap_.top();
-            heap_.pop();
-            delete [] p;
-        }
-    }
-
-    T* allocate(std::size_t n)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (heap_.empty())
-            return new T[n];
-
-        T* next = heap_.top();
-        heap_.pop();
-        return next;
-    }
-
-    void deallocate(T* p)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
-            heap_.push(p);
-        else
-            delete [] p;
-    }
-
-private:
-    mutex_type mtx_;
-    std::size_t max_size_;
-    std::stack<T*> heap_;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // Our partition data type
 struct partition_data
 {
-private:
-    static partition_allocator<double> alloc_;
-
-    static void deallocate(double* p)
-    {
-        alloc_.deallocate(p);
-    }
 
 public:
-    partition_data(std::size_t size)
-      : data_(alloc_.allocate(size)), size_(size)
+    partition_data(double * data, std::size_t size)
+      : data_(data), size_(size)
     {}
 
-    partition_data(partition_data const & other) = delete;
-
-    partition_data(partition_data && other)
-      : data_(other.data_), size_(other.size_)
-    {
-        other.data_ = 0;
-    }
-
-    ~partition_data()
-    {
-        if(data_) alloc_.deallocate(data_);
-    }
-
-    partition_data(std::size_t size, double initial_value)
-      : data_(alloc_.allocate(size)),
-        size_(size)
+    partition_data(double * data, std::size_t size, double initial_value)
+      : data_(data), size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
@@ -140,11 +63,9 @@ public:
     std::size_t size() const { return size_; }
 
 private:
-    double *data_;
+    double * data_;
     std::size_t size_;
 };
-
-partition_allocator<double> partition_data::alloc_;
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
@@ -163,6 +84,7 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 struct stepper
 {
     // Our data for one time step
+    typedef std::vector<std::vector<double>> data_type;
     typedef hpx::shared_future<partition_data> partition;
     typedef std::vector<partition> space;
 
@@ -174,31 +96,33 @@ struct stepper
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition_data heat_part(partition_data const& left,
-        partition_data const& middle, partition_data const& right)
+    static partition_data heat_part(partition_data next, hpx::shared_future<partition_data> const& left_fut,
+        hpx::shared_future<partition_data> const& middle_fut, hpx::shared_future<partition_data> const& right_fut)
     {
+        partition_data const & left = left_fut.get();
+        partition_data const & middle = middle_fut.get();
+        partition_data const & right = right_fut.get();
         std::size_t size = middle.size();
-        partition_data next(size);
-
-
-        std::size_t b = 0;
-        auto range = boost::irange(b, size-1);
-        using hpx::parallel::par;
-        using hpx::parallel::task;
-        auto f =
-        hpx::parallel::for_each(par(task), boost::begin(range), boost::end(range),
-            [&next, &middle](std::size_t i)
-            {
-                next[i] = heat(middle[i-1], middle[i], middle[i+1]);
-            }
-        );
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
+
+        for (std::size_t i = 1; i != size-1; ++i)
+            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+
         next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
 
-        f.wait();
-
         return next;
+    }
+
+    stepper(std::size_t np, std::size_t nx)
+      : data(2)
+    {
+        for (data_type& s: data)
+        {
+            s.resize(np);
+            for(auto& d: s)
+                d.resize(nx);
+        }
     }
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
@@ -208,34 +132,33 @@ struct stepper
         using hpx::lcos::local::dataflow;
         using hpx::util::unwrapped;
 
+        // U holds the data for our partitions.
+
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
         for (space& s: U)
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
-        std::size_t b = 0;
-        auto range = boost::irange(b, np);
-        using hpx::parallel::par;
-        hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
-            [&U, nx](std::size_t i)
-            {
-                U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
-            }
-        );
+        for (std::size_t i = 0; i != np; ++i)
+        {
+            U[0][i] = hpx::make_ready_future(partition_data(data[0][i].data(), nx, double(i)));
+        }
 
-        auto Op = unwrapped(&stepper::heat_part);
+        auto Op = &stepper::heat_part;
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)
         {
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
+            data_type & next_data = data[(t + 1) %2];
 
             for (std::size_t i = 0; i != np; ++i)
             {
                 next[i] = dataflow(
                         hpx::launch::async, Op,
+                        partition_data(next_data[i].data(), nx),
                         current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
                     );
             }
@@ -244,6 +167,8 @@ struct stepper
         // Return the solution at time-step 'nt'.
         return hpx::when_all(U[nt % 2]);
     }
+
+    std::vector<data_type> data;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +183,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
 
     // Create the stepper object
-    stepper step;
+    stepper step(np, nx);
 
     // Measure execution time.
     boost::uint64_t t = hpx::util::high_resolution_clock::now();
