@@ -164,11 +164,11 @@ namespace hpx { namespace components
         /// \return   Returns the GID of the first newly created component
         ///           instance.
         naming::gid_type create_with_args(
-            util::function_nonser<void(void*)> const& ctor)
+            util::unique_function_nonser<void(void*)> ctor)
         {
             if (isenabled_)
             {
-                naming::gid_type id = server::create<Component>(ctor);
+                naming::gid_type id = server::create<Component>(std::move(ctor));
                 if (id)
                     ++refcnt_;
                 return id;
@@ -193,11 +193,11 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::function_nonser<void(void*)> const& ctor)
+            util::unique_function_nonser<void(void*)> ctor)
         {
             if (isenabled_)
             {
-                naming::gid_type id = server::create<Component>(assign_gid, ctor);
+                naming::gid_type id = server::create<Component>(assign_gid, std::move(ctor));
                 if (id)
                     ++refcnt_;
                 return id;

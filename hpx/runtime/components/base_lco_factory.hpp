@@ -74,7 +74,7 @@ namespace hpx { namespace components
         ///         error.
         std::string get_component_name() const
         {
-            return std::string("base_lco_factory for ") + 
+            return std::string("base_lco_factory for ") +
                 get_component_type_name(type_);
         }
 
@@ -115,7 +115,7 @@ namespace hpx { namespace components
         /// \return   Returns the GID of the first newly created component
         ///           instance.
         naming::gid_type create_with_args(
-            util::function_nonser<void(void*)> const&)
+            util::unique_function_nonser<void(void*)>)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "base_lco_factory::create_with_args",
@@ -135,7 +135,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::function_nonser<void(void*)> const& f)
+            util::unique_function_nonser<void(void*)>)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "base_lco_factory::create_with_args",
@@ -151,7 +151,7 @@ namespace hpx { namespace components
         /// \param addr   [in] The resolved address of the first component
         ///               instance to destroy.
         void destroy(naming::gid_type const& gid,
-            naming::address const& addr)    
+            naming::address const& addr)
         {
             server::destroy_base_lco(gid, addr, heap_.get(), type_);
         }

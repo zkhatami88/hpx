@@ -130,6 +130,18 @@ namespace hpx { namespace util { namespace functional
                 return result_type();
             }
 
+            template <typename T>
+            typename util::result_of<bound_type(naming::id_type, T)>::type
+            operator()(naming::id_type lco, T && t)
+            {
+                typedef typename util::result_of<
+                    bound_type(naming::id_type, T)
+                >::type result_type;
+
+                bound_.apply_c(lco, lco, std::forward<T>(t));
+                return result_type();
+            }
+
         private:
             // serialization support
             friend class boost::serialization::access;

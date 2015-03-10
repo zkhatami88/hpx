@@ -463,7 +463,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type, Result)> f_;
+        util::unique_function<void(naming::id_type, Result)> f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -579,7 +579,7 @@ namespace hpx { namespace actions
                 ar << f_;
         }
 
-        util::function<void(naming::id_type)> f_;
+        util::unique_function<void(naming::id_type)> f_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

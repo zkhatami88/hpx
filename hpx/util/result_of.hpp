@@ -23,7 +23,7 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
+//#include <boost/utility/result_of.hpp>
 
 namespace hpx { namespace util
 {
@@ -63,13 +63,15 @@ namespace hpx { namespace util
         ///////////////////////////////////////////////////////////////////////
         template <typename FD, typename F, typename Enable = void>
         struct result_of_impl
-          : boost::result_of<F>
+          //: boost::result_of<F>
+          : std::result_of<F>
         {};
 
         template <typename FD, typename F, typename ...Ts>
         struct result_of_impl<FD, F(Ts...)
           , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type
-        > : boost::result_of<typename boost::unwrap_reference<FD>::type&(Ts...)>
+        //> : boost::result_of<typename boost::unwrap_reference<FD>::type&(Ts...)>
+        > : std::result_of<typename boost::unwrap_reference<FD>::type&(Ts...)>
         {};
 
         /* workaround for tricking result_of into using decltype */
@@ -81,7 +83,8 @@ namespace hpx { namespace util
                   , boost::is_member_function_pointer<FD>
                 >
             >::type
-        > : boost::result_of<FD(Ts...)>
+        //> : boost::result_of<FD(Ts...)>
+        > : std::result_of<FD(Ts...)>
         {};
 
         template <typename FD, typename F, typename Class>

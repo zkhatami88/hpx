@@ -481,6 +481,11 @@ namespace hpx { namespace traits
     struct is_placeholder<util::detail::placeholder<I> >
       : util::detail::placeholder<I>
     {};
+
+    template <typename Action>
+    struct is_action<util::detail::one_shot_wrapper<Action> >
+      : is_action<Action>
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -499,7 +499,7 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::rethrow_exception()
     {
-        if (state_.load() > running)
+        if (int(state_.load()) > int(running))
         {
             boost::mutex::scoped_lock l(mtx_);
             if (exception_)

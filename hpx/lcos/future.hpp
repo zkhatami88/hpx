@@ -250,6 +250,35 @@ namespace hpx { namespace lcos { namespace detail
         }
     }
 
+    template <typename Archive, typename R>
+    typename boost::disable_if<
+        boost::is_void<typename traits::future_traits<shared_future<R> >::type>
+    >::type serialize_future_save(Archive& ar, shared_future<R> const& f)
+    {
+        typedef typename traits::future_traits<shared_future<R> >::type value_type;
+
+        if(f.valid())
+        {
+            HPX_ASSERT(f.is_ready());
+            f.wait();
+        }
+
+        int state = future_state::invalid;
+        if (f.has_value())
+        {
+            state = future_state::has_value;
+            value_type const & value = f.get();
+            ar << state << value;
+        } else if (f.has_exception()) {
+            state = future_state::has_exception;
+            boost::exception_ptr exception = f.get_exception_ptr();
+            ar << state << exception;
+        } else {
+            state = future_state::invalid;
+            ar << state;
+        }
+    }
+
     template <typename Archive, typename Future>
     typename boost::enable_if<
         boost::is_void<typename traits::future_traits<Future>::type>

@@ -31,6 +31,17 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        template <typename Action>
+        struct get_action
+        {
+            typedef Action type;
+        };
+
+        template <typename Action>
+        struct get_action<one_shot_wrapper<Action> >
+        {
+            typedef Action type;
+        };
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_apply_impl
@@ -44,7 +55,7 @@ namespace hpx { namespace util
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::apply<Action>(bind_eval<Action>(
+                return hpx::apply<typename get_action<Action>::type>(bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -76,7 +87,7 @@ namespace hpx { namespace util
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::apply_c<Action>(contgid, bind_eval<Action>(
+                return hpx::apply_c<typename get_action<Action>::type>(contgid, bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -101,7 +112,7 @@ namespace hpx { namespace util
         struct bind_action_async_impl
         {
             typedef lcos::future<typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<typename get_action<Action>::type>::remote_result_type
             >::type> type;
 
             template <std::size_t ...Is>
@@ -111,7 +122,7 @@ namespace hpx { namespace util
               , BoundArgs& bound_args, UnboundArgs&& unbound_args
             )
             {
-                return hpx::async<Action>(bind_eval<Action>(
+                return hpx::async<typename get_action<Action>::type>(bind_eval<Action>(
                     util::get<Is>(bound_args),
                     std::forward<UnboundArgs>(unbound_args))...);
             }
@@ -119,9 +130,7 @@ namespace hpx { namespace util
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
-        lcos::future<typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
-        >::type>
+        typename bind_action_async_impl<Action, BoundArgs, UnboundArgs>::type
         bind_action_async(BoundArgs& bound_args, UnboundArgs&& unbound_args)
         {
             return bind_action_async_impl<Action, BoundArgs, UnboundArgs>::call(
@@ -135,7 +144,7 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::remote_result_type
+            typename hpx::actions::extract_action<typename get_action<Action>::type>::remote_result_type
         >::type
         bind_action_invoke(
             BoundArgs& bound_args
@@ -155,7 +164,7 @@ namespace hpx { namespace util
         {
         public:
             typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
+                typename hpx::actions::extract_action<typename get_action<Action>::type >::remote_result_type
             >::type result_type;
 
         public:
@@ -188,6 +197,15 @@ namespace hpx { namespace util
             BOOST_FORCEINLINE
             bool
             apply_c(naming::id_type const& contgid, Us&&... us) const
+            {
+                return detail::bind_action_apply_cont<Action>(contgid,
+                    _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));
+            }
+
+            template <typename ...Us>
+            BOOST_FORCEINLINE
+            bool
+            apply_c(naming::id_type const& contgid, Us&&... us)
             {
                 return detail::bind_action_apply_cont<Action>(contgid,
                     _bound_args, util::forward_as_tuple(std::forward<Us>(us)...));

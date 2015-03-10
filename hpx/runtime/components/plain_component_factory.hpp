@@ -154,7 +154,7 @@ namespace hpx { namespace components
         ///         created (\a count > 1) the GID's of all new instances are
         ///         sequential in a row.
         naming::gid_type create_with_args(
-            util::function_nonser<void(void*)> const&)
+            util::unique_function_nonser<void(void*)>)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "plain_component_factory::create_with_args",
@@ -175,7 +175,7 @@ namespace hpx { namespace components
         ///           instance (this is the same as assign_gid, if successful).
         naming::gid_type create_with_args(
             naming::gid_type const& assign_gid,
-            util::function_nonser<void(void*)> const& f)
+            util::unique_function_nonser<void(void*)>)
         {
             HPX_THROW_EXCEPTION(bad_request,
                 "plain_component_factory::create_with_args",

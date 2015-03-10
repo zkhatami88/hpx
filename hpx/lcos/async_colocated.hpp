@@ -46,7 +46,7 @@ namespace hpx { namespace detail
 }}
 
 #define HPX_REGISTER_ASYNC_COLOCATED_DECLARATION(Action, Name)                \
-    HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                   \
+    HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(                            \
         void (hpx::naming::id_type, hpx::agas::response)                      \
       , (hpx::util::functional::detail::async_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
@@ -61,7 +61,7 @@ namespace hpx { namespace detail
 /**/
 
 #define HPX_REGISTER_ASYNC_COLOCATED(Action, Name)                            \
-    HPX_UTIL_REGISTER_FUNCTION(                                               \
+    HPX_UTIL_REGISTER_UNIQUE_FUNCTION(                                        \
         void (hpx::naming::id_type, hpx::agas::response)                      \
       , (hpx::util::functional::detail::apply_continuation_impl<              \
             hpx::util::detail::bound_action<                                  \
@@ -100,7 +100,7 @@ namespace hpx
         using util::placeholders::_2;
         return detail::async_continue_r<action_type, remote_result_type>(
             util::functional::async_continuation(
-                util::bind<Action>(
+                util::bind<util::detail::one_shot_wrapper<Action> >(
                     util::bind(util::functional::extract_locality(), _2, gid)
                   , std::forward<Ts>(vs)...)
                 ), service_target, req);
