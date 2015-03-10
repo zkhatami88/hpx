@@ -18,6 +18,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <hpx/include/parallel_algorithm.hpp>
+#include <boost/range/irange.hpp>
+
 #include "print_time_results.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,13 +46,32 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 // Our partition data type
 struct partition_data
 {
+public:
+    partition_data()
+    {}
+
+    partition_data(std::size_t size)
+      : data_(new double[size])
+    {}
+
+    double * data(std::size_t offset)
+    {
+        return data_.get() + offset;
+    }
+
+private:
+    std::unique_ptr<double[]> data_;
+};
+
+struct partition_view
+{
 
 public:
-    partition_data(double * data, std::size_t size)
+    partition_view(double * data, std::size_t size)
       : data_(data), size_(size)
     {}
 
-    partition_data(double * data, std::size_t size, double initial_value)
+    partition_view(double * data, std::size_t size, double initial_value)
       : data_(data), size_(size)
     {
         double base_value = double(initial_value * size);
@@ -67,7 +89,7 @@ private:
     std::size_t size_;
 };
 
-std::ostream& operator<<(std::ostream& os, partition_data const& c)
+std::ostream& operator<<(std::ostream& os, partition_view const& c)
 {
     os << "{";
     for (std::size_t i = 0; i != c.size(); ++i)
@@ -84,8 +106,8 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 struct stepper
 {
     // Our data for one time step
-    typedef std::vector<std::vector<double>> data_type;
-    typedef hpx::shared_future<partition_data> partition;
+    typedef std::vector<partition_data> data_type;
+    typedef hpx::shared_future<partition_view> partition;
     typedef std::vector<partition> space;
 
     // Our operator
@@ -96,12 +118,9 @@ struct stepper
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition_data heat_part(partition_data next, hpx::shared_future<partition_data> const& left_fut,
-        hpx::shared_future<partition_data> const& middle_fut, hpx::shared_future<partition_data> const& right_fut)
+    static partition_view heat_part(partition_view next, partition_view left,
+        partition_view middle, partition_view right)
     {
-        partition_data const & left = left_fut.get();
-        partition_data const & middle = middle_fut.get();
-        partition_data const & right = right_fut.get();
         std::size_t size = middle.size();
 
         next[0] = heat(left[size-1], middle[0], middle[1]);
@@ -117,12 +136,14 @@ struct stepper
     stepper(std::size_t np, std::size_t nx)
       : data(2)
     {
+        /*
         for (data_type& s: data)
         {
             s.resize(np);
             for(auto& d: s)
                 d.resize(nx);
         }
+        */
     }
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
@@ -132,33 +153,42 @@ struct stepper
         using hpx::lcos::local::dataflow;
         using hpx::util::unwrapped;
 
-        // U holds the data for our partitions.
-
         // U[t][i] is the state of position i at time t.
         std::vector<space> U(2);
-        for (space& s: U)
-            s.resize(np);
+        data[0].resize(np);
+        data[1].resize(np);
+        U[0].resize(np);
+        U[1].resize(np);
 
-        // Initial conditions: f(0, i) = i
-        for (std::size_t i = 0; i != np; ++i)
-        {
-            U[0][i] = hpx::make_ready_future(partition_data(data[0][i].data(), nx, double(i)));
-        }
+        // Setting up our partitions with initial values and the view to the values.
+        // U holds the view to our partitions.
+        std::size_t b = 0;
+        auto range = boost::irange(b, np);
+        using hpx::parallel::par;
+        hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
+            [this, &U, nx](std::size_t i)
+            {
+                data[0][i] = partition_data(nx);
+                data[1][i] = partition_data(nx);
+                // Initial conditions: f(0, i) = i
+                U[0][i] = hpx::make_ready_future(partition_view(data[0][i].data(0), nx, double(i)));
+                U[1][i] = hpx::make_ready_future(partition_view(data[1][i].data(0), nx));
+            }
+        );
 
-        auto Op = &stepper::heat_part;
+        auto Op = hpx::util::unwrapped(&stepper::heat_part);
 
         // Actual time step loop
         for (std::size_t t = 0; t != nt; ++t)
         {
             space const& current = U[t % 2];
             space& next = U[(t + 1) % 2];
-            data_type & next_data = data[(t + 1) %2];
 
             for (std::size_t i = 0; i != np; ++i)
             {
                 next[i] = dataflow(
                         hpx::launch::async, Op,
-                        partition_data(next_data[i].data(), nx),
+                        next[i],
                         current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
                     );
             }

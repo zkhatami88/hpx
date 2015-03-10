@@ -12,6 +12,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/lcos/gather.hpp>
 
+#include <hpx/include/parallel_algorithm.hpp>
+#include <boost/range/irange.hpp>
+
 #include <boost/shared_array.hpp>
 #include <boost/serialization/vector.hpp>
 
@@ -30,149 +33,114 @@ char const* stepper_basename = "/1d_stencil_8/stepper/";
 char const* gather_basename = "/1d_stencil_8/gather/";
 
 ///////////////////////////////////////////////////////////////////////////////
-// Use a special allocator for the partition data to remove a major contention
-// point - the constant allocation and deallocation of the data arrays.
-template <typename T>
-struct partition_allocator
-{
-private:
-    typedef hpx::lcos::local::spinlock mutex_type;
-
-public:
-    partition_allocator(std::size_t max_size = std::size_t(-1))
-      : max_size_(max_size)
-    {
-    }
-
-    ~partition_allocator()
-    {
-        mutex_type::scoped_lock l(mtx_);
-        while (!heap_.empty())
-        {
-            T* p = heap_.top();
-            heap_.pop();
-            delete [] p;
-        }
-    }
-
-    T* allocate(std::size_t n)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (heap_.empty())
-            return new T[n];
-
-        T* next = heap_.top();
-        heap_.pop();
-        return next;
-    }
-
-    void deallocate(T* p)
-    {
-        mutex_type::scoped_lock l(mtx_);
-        if (max_size_ == static_cast<std::size_t>(-1) || heap_.size() < max_size_)
-            heap_.push(p);
-        else
-            delete [] p;
-    }
-
-private:
-    mutex_type mtx_;
-    std::size_t max_size_;
-    std::stack<T*> heap_;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 struct partition_data
 {
 private:
-    typedef hpx::util::serialize_buffer<double> buffer_type;
-
-    struct hold_reference
+    struct deleter
     {
-        hold_reference(buffer_type const& data)
-          : data_(data)
+        deleter()
+          : delete_(true)
         {}
 
-        void operator()(double*) {}     // no deletion necessary
+        explicit deleter(bool to_delete)
+          : delete_(to_delete)
+        {}
 
-        buffer_type data_;
+        void operator()(double * p) const
+        {
+            if(delete_) delete [] p;
+        }
+
+        bool delete_;
     };
-
-    static void deallocate(double* p)
-    {
-        alloc_.deallocate(p);
-    }
-
-    static partition_allocator<double> alloc_;
 
 public:
     partition_data()
       : size_(0)
+      , min_index_(0)
+      , max_index_(0)
     {}
 
-    // Create a new (uninitialized) partition of the given size.
-    partition_data(std::size_t size)
-      : data_(alloc_.allocate(size), size, buffer_type::take,
-            &partition_data::deallocate),
-        size_(size),
-        min_index_(0)
+    explicit partition_data(std::size_t size)
+      : data_(new double[size]), size_(size)
+      , min_index_(0)
+      , max_index_(size)
     {}
 
-    // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
-      : data_(alloc_.allocate(size), size, buffer_type::take,
-            &partition_data::deallocate),
-        size_(size),
-        min_index_(0)
+      : data_(new double[size])
+      , size_(size)
+      , min_index_(0)
+      , max_index_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
     }
 
-    // Create a partition which acts as a proxy to a part of the embedded array.
-    // The proxy is assumed to refer to either the left or the right boundary
-    // element.
-    partition_data(partition_data const& base, std::size_t min_index)
-      : data_(base.data_.data()+min_index, 1, buffer_type::reference,
-            hold_reference(base.data_)),      // keep referenced partition alive
-        size_(base.size()),
-        min_index_(min_index)
+    partition_data(partition_data && base)
+      : data_(std::move(base.data_))
+      , size_(base.size())
+      , min_index_(base.min_index_)
+      , max_index_(base.max_index_)
+    {}
+
+    partition_data(partition_data const & base, std::size_t min_index, std::size_t max_index)
+      : data_(base.data_.get() + min_index, deleter(false))
+      , size_(base.size())
+      , min_index_(min_index)
+      , max_index_(max_index)
     {
         HPX_ASSERT(min_index < base.size());
+        HPX_ASSERT(max_index <= base.size());
     }
 
-    double& operator[](std::size_t idx) { return data_[index(idx)]; }
-    double operator[](std::size_t idx) const { return data_[index(idx)]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[index(idx)];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[index(idx)];
+    }
 
     std::size_t size() const { return size_; }
 
 private:
+    std::unique_ptr<double[], deleter> data_;
+    std::size_t size_;
+    std::size_t min_index_;
+    std::size_t max_index_;
+
     std::size_t index(std::size_t idx) const
     {
-        HPX_ASSERT(idx >= min_index_ && idx < size_);
+        HPX_ASSERT(idx >= min_index_ && idx < max_index_);
         return idx - min_index_;
     }
 
-private:
     // Serialization support: even if all of the code below runs on one
     // locality only, we need to provide an (empty) implementation for the
     // serialization as all arguments passed to actions have to support this.
     friend class boost::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
+    void load(Archive& ar, const unsigned int version)
     {
-        ar & data_ & size_ & min_index_;
+        ar & min_index_ & max_index_ & size_;
+        data_.reset(new double[max_index_ - min_index_]);
+        boost::serialization::array<double> arr(data_.get(), max_index_ - min_index_);
+        ar.load_array(arr, version);
     }
 
-private:
-    buffer_type data_;
-    std::size_t size_;
-    std::size_t min_index_;
+    template <typename Archive>
+    void save(Archive& ar, const unsigned int version) const
+    {
+        ar & min_index_ & max_index_ & size_;
+        boost::serialization::array<double> arr(data_.get(), max_index_ - min_index_);
+        ar.save_array(arr, version);
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
-
-partition_allocator<double> partition_data::alloc_;
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {
@@ -215,8 +183,8 @@ struct partition_server
     // construct new instances
     partition_server() {}
 
-    partition_server(partition_data const& data)
-      : data_(data)
+    partition_server(partition_data data)
+      : data_(std::move(data))
     {}
 
     partition_server(std::size_t size, double initial_value)
@@ -232,19 +200,19 @@ struct partition_server
         switch (t)
         {
         case left_partition:
-            return partition_data(data_, data_.size()-1);
+            return partition_data(data_, data_.size()-1, data_.size());
 
         case middle_partition:
+            return partition_data(data_, 0, data_.size());
             break;
 
         case right_partition:
-            return partition_data(data_, 0);
+            return partition_data(data_, 0, 1);
 
         default:
             HPX_ASSERT(false);
             break;
         }
-        return data_;
     }
 
     // Every member function which has to be invoked remotely needs to be
@@ -286,8 +254,8 @@ struct partition : hpx::components::client_base<partition, partition_server>
 
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
-    partition(hpx::id_type where, partition_data const& data)
-      : base_type(hpx::new_colocated<partition_server>(where, data))
+    partition(hpx::id_type where, partition_data data)
+      : base_type(hpx::new_colocated<partition_server>(where, std::move(data)))
     {}
 
     // Attach a future representing a (possibly remote) partition.
@@ -357,8 +325,8 @@ protected:
 
     // The partitioned operator, it invokes the heat operator above on all
     // elements of a partition.
-    static partition heat_part(partition_data const& left, partition_data const& middle,
-        partition_data const& right);
+    static partition heat_part(hpx::future<partition_data> left_future,
+        hpx::future<partition_data> middle_future, hpx::future<partition_data> right_future);
 
     // Helper functions to receive the left and right boundary elements from
     // the neighbors.
@@ -434,11 +402,12 @@ struct stepper : hpx::components::client_base<stepper, stepper_server>
 ///////////////////////////////////////////////////////////////////////////////
 // The partitioned operator, it invokes the heat operator above on all elements
 // of a partition.
-partition stepper_server::heat_part(partition_data const& left,
-    partition_data const& middle, partition_data const& right)
+partition stepper_server::heat_part(hpx::future<partition_data> left_future,
+    hpx::future<partition_data> middle_future, hpx::future<partition_data> right_future)
 {
-    using hpx::lcos::local::dataflow;
-    using hpx::util::unwrapped;
+    partition_data right = right_future.get();
+    partition_data middle = middle_future.get();
+    partition_data left = left_future.get();
 
     std::size_t size = middle.size();
     partition_data next(size);
@@ -450,7 +419,7 @@ partition stepper_server::heat_part(partition_data const& left,
 
     next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
 
-    return partition(hpx::find_here(), next);
+    return partition(hpx::find_here(), std::move(next));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -469,10 +438,17 @@ stepper_server::space stepper_server::do_work(std::size_t local_np,
 
     // Initial conditions: f(0, i) = i
     hpx::id_type here = hpx::find_here();
-    for (std::size_t i = 0; i != local_np; ++i)
-        U_[0][i] = partition(here, nx, double(i));
+    std::size_t b = 0;
+    auto range = boost::irange(b, local_np);
+    using hpx::parallel::par;
+    hpx::parallel::for_each(par, boost::begin(range), boost::end(range),
+        [this, here, nx](std::size_t i)
+        {
+            U_[0][i] = partition(here, nx, double(i));
+        }
+    );
 
-    auto Op = unwrapped(&stepper_server::heat_part);
+    auto Op = &stepper_server::heat_part;
 
     // send initial values to neighbors
     send_left(0, U_[0][0]);
