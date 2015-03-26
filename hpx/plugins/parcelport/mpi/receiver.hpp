@@ -20,8 +20,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
     struct receiver
     {
+        typedef header<512> header_type;
         typedef hpx::lcos::local::spinlock mutex_type;
-        typedef std::list<std::pair<int, header> > header_list;
+        typedef std::list<std::pair<int, header_type> > header_list;
         typedef std::set<std::pair<int, int> > handles_header_type;
         typedef util::memory_chunk_pool<mutex_type> memory_pool_type;
         typedef util::detail::memory_chunk_pool_allocator<
@@ -69,7 +70,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             receiver &receiver_;
             bool handles_;
-            header h_;
+            header_type h_;
             handles_header_type::iterator header_handle_;
         };
 
@@ -131,7 +132,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     {
 
                         int source = it->first;
-                        header h = it->second;
+                        header_type h = it->second;
                         headers_.erase(it);
 
                         {
@@ -157,7 +158,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return did_some_work;
         }
 
-        void receive_message(int source, header h)
+        void receive_message(int source, header_type h)
         {
             util::high_resolution_timer timer;
             MPI_Request request;
@@ -277,16 +278,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 MPI_Status status;
                 if(request_done_locked(hdr_request_, &status))
                 {
-                    header h = new_header();
+                    header_type h = new_header();
                     h.assert_valid();
                     headers_.push_back(std::make_pair(status.MPI_SOURCE, h));
                 }
             }
         }
 
-        header new_header()
+        header_type new_header()
         {
-            header h = rcv_header_;
+            header_type h = rcv_header_;
             rcv_header_.reset();
             MPI_Irecv(
                 rcv_header_.data()
@@ -306,8 +307,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         mutex_type headers_mtx_;
         MPI_Request hdr_request_;
-        header rcv_header_;
-        std::list<std::pair<int, header> > headers_;
+        header_type rcv_header_;
+        std::list<std::pair<int, header_type> > headers_;
 
         mutex_type handles_header_mtx_;
         handles_header_type handles_header_;
