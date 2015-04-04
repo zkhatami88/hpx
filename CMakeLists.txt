@@ -170,7 +170,6 @@ if(APPLE)
   set(HPX_FULL_RPATH_DEFAULT OFF)
 endif()
 hpx_option(HPX_FULL_RPATH BOOL "Build and link HPX libraries and executables with full RPATHs (default: ON)" OFF ADVANCED)
-hpx_option(HPX_BUILD_WITH_INSTALL_PREFIX BOOL "Always set the HPX_PREFIX default to the install directory (default: OFF)" OFF ADVANCED)
 
 ################################################################################
 # Native TLS configuration
@@ -758,6 +757,10 @@ if(HPX_COMPILER_WARNINGS)
     if(MPI_FOUND)
       hpx_add_compile_flag(-wd4800)
     endif()
+
+    hpx_add_compile_flag(-wd4800)
+    hpx_add_compile_flag(-wd4251)
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wextra LANGUAGES CXX C Fortran)
@@ -787,7 +790,7 @@ if(HPX_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wdouble-promotion)
 
     # Warn about casting that violates qualifiers or alignment
-    hpx_add_compile_flag_if_available(-Wcast-qual)
+    #hpx_add_compile_flag_if_available(-Wcast-qual)
     if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
       # Clang is overeager in reporting cast alignment problems in Boost
       hpx_add_compile_flag_if_available(-Wcast-align)
@@ -805,7 +808,7 @@ if(HPX_COMPILER_WARNINGS)
       hpx_add_compile_flag_if_available(-Werror=uninitialized)
     endif()
 
-    #hpx_add_compile_flag_if_available(-Werror=missing-field-initializers)
+    hpx_add_compile_flag_if_available(-Wno-missing-field-initializers)
     hpx_add_compile_flag_if_available(-Werror=format)
     hpx_add_compile_flag_if_available(-Werror=missing-braces)
     hpx_add_compile_flag_if_available(-Werror=sign-compare)
@@ -929,9 +932,11 @@ hpx_check_for_cxx11_alias_templates(
 hpx_check_for_cxx11_defaulted_deleted_functions(
   DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
 
-hpx_check_for_cxx11_std_unique_ptr(
-  DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
-              BOOST_LOCKFREE_HAVE_CXX11_STD_UNIQUE_PTR)
+hpx_check_for_cxx11_std_unique_ptr()
+
+if(NOT HPX_WITH_CXX11_UNIQUE_PTR)
+  hpx_error("HPX needs support for C++11 std::unique_ptr")
+endif()
 
 hpx_check_for_cxx11_std_initializer_list(
   DEFINITIONS HPX_HAVE_CXX11_STD_INITIALIZER_LIST)
@@ -1113,18 +1118,13 @@ foreach(def ${HPX_CONFIG_DEFINITIONS_VAR})
 endforeach()
 
 # Generate a defines.hpp to be used in the build directory ...
-if(HPX_BUILD_WITH_INSTALL_PREFIX)
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-else()
-  set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
-endif()
+set(HPX_DEFINES_PREFIX ${HPX_BUILD_PREFIX})
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/hpx/config/defines.hpp"
                @ONLY)
 
 # Generate a defines.hpp to be used in the install directory ...
 set(HPX_DEFINES_PREFIX ${HPX_PREFIX})
-
 configure_file("${hpx_SOURCE_DIR}/cmake/templates/config_defines.hpp.in"
                "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/hpx/config/defines.hpp"
                @ONLY)
@@ -1138,13 +1138,12 @@ configure_file("${hpx_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
 # installation instructions
 ################################################################################
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/bin/
-  DESTINATION hpx/bin/
+  FILES "${CMAKE_BINARY_DIR}/bin/hpxrun.py"
+  DESTINATION bin
   COMPONENT core
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                   GROUP_READ GROUP_EXECUTE
-                   WORLD_READ WORLD_EXECUTE
-  FILES_MATCHING PATTERN "hpxcxx" EXCLUDE)
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+  GROUP_READ GROUP_EXECUTE
+  WORLD_READ WORLD_EXECUTE)
 
 install( # install all hpx header files
   DIRECTORY hpx/

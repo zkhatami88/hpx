@@ -29,6 +29,8 @@
 #include <boost/foreach.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
@@ -329,9 +331,9 @@ namespace hpx
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
             std::size_t interval, error_code& ec = throws);
-        util::binary_filter* create_binary_filter(
+        serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            util::binary_filter* next_filter, error_code& ec = throws);
+            serialization::binary_filter* next_filter, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
         components::security::signed_certificate
@@ -415,7 +417,7 @@ namespace hpx
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies
         mutable lcos::local::spinlock security_mtx_;
-        HPX_STD_UNIQUE_PTR<detail::manage_security_data> security_data_;
+        std::unique_ptr<detail::manage_security_data> security_data_;
         components::security::certificate_store const * cert_store(error_code& ec) const;
 #endif
     };

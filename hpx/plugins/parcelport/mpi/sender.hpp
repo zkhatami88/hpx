@@ -120,9 +120,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
             }
 
-            BOOST_FOREACH(util::serialization_chunk & c, buffer.chunks_)
+            BOOST_FOREACH(serialization::serialization_chunk & c, buffer.chunks_)
             {
-                if(c.type_ == util::chunk_type_pointer)
+                if(c.type_ == serialization::chunk_type_pointer)
                 {
                     wait_done(wait_request, background);
                     {

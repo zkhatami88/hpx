@@ -11,11 +11,14 @@
 #define HPX_PARCELSET_ENCODE_PARCEL_HPP
 
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/traits/is_chunk_allocator.hpp>
 
 #include <boost/integer/endian.hpp>
 #include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
+
+#include <memory>
 
 namespace hpx
 {
@@ -45,9 +48,9 @@ namespace hpx
             chunks.reserve(buffer.chunks_.size());
 
             std::size_t index = 0;
-            BOOST_FOREACH(util::serialization_chunk& c, buffer.chunks_)
+            BOOST_FOREACH(serialization::serialization_chunk& c, buffer.chunks_)
             {
-                if (c.type_ == util::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type_pointer)
                     chunks.push_back(transmission_chunk_type(index, c.size_));
                 ++index;
             }
@@ -60,9 +63,9 @@ namespace hpx
 
             if (!chunks.empty()) {
                 // the remaining number of chunks are non-zero-copy
-                BOOST_FOREACH(util::serialization_chunk& c, buffer.chunks_)
+                BOOST_FOREACH(serialization::serialization_chunk& c, buffer.chunks_)
                 {
-                    if (c.type_ == util::chunk_type_index) {
+                    if (c.type_ == serialization::chunk_type_index) {
                         chunks.push_back(
                             transmission_chunk_type(c.data_.index_, c.size_));
                     }
@@ -114,22 +117,22 @@ LOG_DEBUG_MSG("Inside encode parcels reserving arg size " << decnumber(std::max(
 
                     {
                         // Serialize the data
-                        HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                        std::unique_ptr<serialization::binary_filter> filter(
                             ps[0].get_serialization_filter());
 
                         int archive_flags = archive_flags_;
                         if (filter.get() != 0) {
                             filter->set_max_length(buffer.data_.capacity());
-                            archive_flags |= util::enable_compression;
+                            archive_flags |= serialization::enable_compression;
                         }
 
 LOG_DEBUG_MSG("archiving parcels (filter capacity) " << decnumber(buffer.data_.capacity()));
-                        util::portable_binary_oarchive archive(
+                        serialization::output_archive archive(
                             buffer.data_
-                          , &buffer.chunks_
+                          , archive_flags
                           , dest_locality_id
-                          , filter.get()
-                          , archive_flags);
+                          , &buffer.chunks_
+                          , filter.get());
 
                         if(num_parcels != std::size_t(-1))
                             archive << parcels_sent;

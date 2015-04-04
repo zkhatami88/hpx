@@ -10,7 +10,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/util/void_cast.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
@@ -83,16 +82,6 @@ namespace hpx { namespace components { namespace server
 #if defined(BOOST_MSVC)
 #pragma warning(pop)
 #endif
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
-    (template <typename F>)
-  , (hpx::components::server::remote_object_apply_action1<F>)
-)
-
-HPX_SERIALIZATION_REGISTER_TEMPLATE_ACTION(
-    (template <typename F, typename A>)
-  , (hpx::components::server::remote_object_apply_action2<F, A>)
-)
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::remote_object::set_dtor_action
