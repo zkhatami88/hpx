@@ -105,7 +105,7 @@ LOG_DEBUG_MSG("Default chunk size is " << hexnumber(chunk_default))
                     {
                         if (arg_size >= max_outbound_size)
                             break;
-                        arg_size += traits::get_type_size(ps[parcels_sent]);
+                        arg_size += traits::get_type_size(ps[parcels_sent],archive_flags_);
                     }
 
                     buffer.data_.reserve((std::max)(chunk_default, arg_size));
