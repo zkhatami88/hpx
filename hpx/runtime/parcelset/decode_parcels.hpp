@@ -81,14 +81,13 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Parcelport, typename Buffer>
-    void decode_message(
+    void decode_message_with_chunks(
         Parcelport & pp
       , Buffer buffer
       , std::size_t parcel_count
+      , std::vector<serialization::serialization_chunk> &chunks
     )
     {
-        std::vector<serialization::serialization_chunk> chunks(decode_chunks(buffer));
-
         unsigned archive_flags = 0U;
         if (!pp.allow_array_optimizations()) {
             archive_flags |= serialization::disable_array_optimization;
@@ -174,6 +173,18 @@ namespace hpx { namespace parcelset
                 << "decode_message: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Parcelport, typename Buffer>
+    void decode_message(
+        Parcelport & pp
+      , Buffer buffer
+      , std::size_t parcel_count
+    )
+    {
+        std::vector<serialization::serialization_chunk> chunks(decode_chunks(buffer));
+        decode_message_with_chunks(pp, std::move(buffer), parcel_count, chunks);
     }
 
     template <typename Parcelport, typename Buffer>
