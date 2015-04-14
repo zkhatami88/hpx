@@ -19,6 +19,8 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/type_traits/is_abstract.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace serialization { namespace detail
 {
     struct function_bunch_type
@@ -47,7 +49,7 @@ namespace hpx { namespace serialization { namespace detail
         void register_class(const std::string& class_name,
             const function_bunch_type& bunch)
         {
-             map_[class_name] = bunch;
+             map_.emplace(class_name, bunch);
         }
 
         // the following templates are defined in *.ipp file
@@ -67,7 +69,7 @@ namespace hpx { namespace serialization { namespace detail
         {
         }
 
-        friend hpx::util::static_<polymorphic_nonintrusive_factory>;
+        friend class hpx::util::static_<polymorphic_nonintrusive_factory>;
 
         serializer_map_type map_;
     };
@@ -156,6 +158,8 @@ namespace hpx { namespace serialization { namespace detail
             instance;
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_REGISTER_CLASS(Class)                               \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class);                               \

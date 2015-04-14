@@ -17,8 +17,10 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/atomic/atomic.hpp>
+#include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace serialization { namespace detail
 {
@@ -37,7 +39,7 @@ namespace hpx { namespace serialization { namespace detail
 
         void register_class(const std::string& name, ctor_type fun)
         {
-            map_[name] = fun;
+            map_.emplace(name, fun);
         }
 
         template <class T>
@@ -189,6 +191,8 @@ namespace hpx { namespace serialization { namespace detail {
     }
 
 }}}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_WITH_NAME(Class, Name)             \
   HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, (Name +                          \

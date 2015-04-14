@@ -469,7 +469,7 @@ namespace hpx { namespace traits
                 return b.size() * sizeof(T) + sizeof(std::size_t) + sizeof(Allocator); //-V119
             }
             else {
-                // not completely sure of the size required to specify a new pointer chunk is coming
+                // size required to specify a new pointer chunk is coming (needs checking)
                 return 8;
             }
         }

@@ -9,12 +9,10 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
 
-#include <boost/foreach.hpp>
-
 #include <vector>
 
-namespace hpx { namespace serialization {
-
+namespace hpx { namespace serialization
+{
     // load vector<T>
     template <typename T, typename Allocator>
     void load_impl(input_archive & ar, std::vector<T, Allocator> & vs, boost::mpl::false_)
@@ -93,7 +91,7 @@ namespace hpx { namespace serialization {
     {
         // normal save ...
         typedef typename std::vector<T>::value_type value_type;
-        BOOST_FOREACH(value_type & v, vs)
+        for(value_type & v : vs)
         {
             ar << v;
         }

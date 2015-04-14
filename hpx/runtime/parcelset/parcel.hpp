@@ -508,8 +508,8 @@ namespace hpx { namespace parcelset
             std::size_t get_type_size(int flags) const
             {
                 return sizeof(parcel_buffer) +
-                    traits::type_size<std::vector<naming::id_type> >::call(dests_,flags) +
-                    traits::type_size<std::vector<naming::address> >::call(addrs_,flags) +
+                    traits::type_size<std::vector<naming::id_type> >::call(dests_, flags) +
+                    traits::type_size<std::vector<naming::address> >::call(addrs_, flags) +
                     this->get_action()->get_type_size(flags);      // action
             }
 
