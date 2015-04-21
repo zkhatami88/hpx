@@ -21,8 +21,8 @@ namespace hpx { namespace parcelset { namespace policies
     template <int SIZE>
     struct header
     {
-        typedef int value_type;
-        typedef char flag_type;
+        typedef uint32_t value_type;
+        typedef char     flag_type;
         enum data_pos
         {
             pos_tag               = 0 * sizeof(value_type),
@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset { namespace policies
         static int const data_size_ = SIZE;
 
         template <typename Buffer>
-        header(Buffer const & buffer, int tag, bool enable_piggyback_copy=true)
+        header(Buffer const & buffer, uint32_t tag, bool enable_piggyback_copy=true)
         {
             boost::int64_t size = static_cast<boost::int64_t>(buffer.size_);
             boost::int64_t numbytes = static_cast<boost::int64_t>(buffer.data_size_);
@@ -189,7 +189,7 @@ namespace hpx { namespace parcelset { namespace policies
               , tag_(provider_->acquire())
             {}
 
-            operator int () const
+            operator uint32_t () const
             {
                 return tag_;
             }
@@ -200,7 +200,7 @@ namespace hpx { namespace parcelset { namespace policies
             }
 
             tag_provider *provider_;
-            int tag_;
+            uint32_t tag_;
         };
 
         tag_provider()
@@ -212,7 +212,7 @@ namespace hpx { namespace parcelset { namespace policies
             return tag(this);
         }
 
-        int acquire()
+        uint32_t acquire()
         {
             mutex_type::scoped_lock l(mtx_);
 //            if(free_tags_.empty())
@@ -232,7 +232,7 @@ namespace hpx { namespace parcelset { namespace policies
         }
 
         mutex_type mtx_;
-        int next_tag_;
+        uint32_t   next_tag_;
 //        std::deque<int> free_tags_;
     };
 
