@@ -16,7 +16,6 @@
 #include <hpx/traits/is_chunk_allocator.hpp>
 
 #include <boost/integer/endian.hpp>
-#include "plugins/parcelport/verbs/rdmahelper/include/RdmaLogging.h"
 
 #include <memory>
 
@@ -54,7 +53,6 @@ namespace hpx
                     chunks.push_back(transmission_chunk_type(index, c.size_));
                 ++index;
             }
-            LOG_DEBUG_MSG("Encode finalize : zero-copy chunks " << decnumber(chunks.size()));
 
             buffer.num_chunks_ = count_chunks_type(
                 static_cast<boost::uint32_t>(chunks.size()),
@@ -71,7 +69,6 @@ namespace hpx
                     }
                 }
             }
-            LOG_DEBUG_MSG("Encode finalize : total chunks " << decnumber(chunks.size()));
         }
 
         template <typename Buffer>
@@ -79,7 +76,6 @@ namespace hpx
         encode_parcels(parcel const * ps, std::size_t num_parcels, Buffer & buffer,
             int archive_flags_, boost::uint64_t max_outbound_size)
         {
-          FUNC_START_DEBUG_MSG;
             HPX_ASSERT(buffer.data_.empty());
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
@@ -99,7 +95,6 @@ namespace hpx
                             typename Buffer::allocator_type
                         >::call(buffer.data_.get_allocator());
 
-LOG_DEBUG_MSG("Default chunk size is " << hexnumber(chunk_default))
                     // preallocate data
                     for (/**/; parcels_sent != parcels_size; ++parcels_sent)
                     {
@@ -109,8 +104,6 @@ LOG_DEBUG_MSG("Default chunk size is " << hexnumber(chunk_default))
                     }
 
                     buffer.data_.reserve((std::max)(chunk_default, arg_size));
-                    
-LOG_DEBUG_MSG("Inside encode parcels reserving arg size " << decnumber(std::max(chunk_default,arg_size)) << " instead of " << decnumber(arg_size));
 
                     // mark start of serialization
                     util::high_resolution_timer timer;
@@ -126,7 +119,6 @@ LOG_DEBUG_MSG("Inside encode parcels reserving arg size " << decnumber(std::max(
                             archive_flags |= serialization::enable_compression;
                         }
 
-LOG_DEBUG_MSG("archiving parcels (filter capacity) " << decnumber(buffer.data_.capacity()));
                         serialization::output_archive archive(
                             buffer.data_
                           , archive_flags
@@ -141,11 +133,6 @@ LOG_DEBUG_MSG("archiving parcels (filter capacity) " << decnumber(buffer.data_.c
                             archive << ps[i];
 
                         arg_size = archive.bytes_written();
-
-            LOG_DEBUG_MSG(
-                   "Inside encode parcels with bytes_written " << decnumber(archive.bytes_written())
-                << " actual containter data size " << decnumber(buffer.data_.size())
-                << " parcels_sent " << decnumber(parcels_sent));
                     }
 
                     // store the time required for serialization
@@ -193,10 +180,8 @@ LOG_DEBUG_MSG("archiving parcels (filter capacity) " << decnumber(buffer.data_.c
             }
 
             buffer.data_point_.num_parcels_ = parcels_sent;
-            LOG_DEBUG_MSG("Inside encode parcels with num_parcels_sent " << decnumber(buffer.data_point_.num_parcels_));
             encode_finalize(buffer, arg_size);
 
-            FUNC_END_DEBUG_MSG;
             return parcels_sent;
         }
     }
