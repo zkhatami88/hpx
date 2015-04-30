@@ -43,8 +43,8 @@
 #include <mutex>
 #include <condition_variable>
 
-#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
-//#define HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
+#define HPX_WITH_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD DEFAULT_MEMORY_POOL_CHUNK_SIZE
+//#define HPX_WITH_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD 256
 
 using namespace hpx::parcelset::policies;
 
@@ -139,9 +139,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                 if (NULL != sec) {
                     std::string ibverbs_enabled(sec->get_entry("enable", "0"));
                     if (boost::lexical_cast<int>(ibverbs_enabled)) {
-                        _ibverbs_ifname    = sec->get_entry("ifname",    HPX_PARCELPORT_VERBS_IFNAME);
-                        _ibverbs_device    = sec->get_entry("device",    HPX_PARCELPORT_VERBS_DEVICE);
-                        _ibverbs_interface = sec->get_entry("interface", HPX_PARCELPORT_VERBS_INTERFACE);
+                        _ibverbs_ifname    = sec->get_entry("ifname",    HPX_WITH_PARCELPORT_VERBS_IFNAME);
+                        _ibverbs_device    = sec->get_entry("device",    HPX_WITH_PARCELPORT_VERBS_DEVICE);
+                        _ibverbs_interface = sec->get_entry("interface", HPX_WITH_PARCELPORT_VERBS_INTERFACE);
                         char buff[256];
                         _ibv_ip = hpx::parcelset::policies::verbs::Get_rdma_device_address(_ibverbs_device.c_str(), _ibverbs_interface.c_str(), buff);
                         LOG_DEBUG_MSG("here() got hostname of " << buff);
@@ -899,7 +899,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace verbs
                         // if the data chunk fits into a memory block, copy it
                         util::high_resolution_timer regtimer;
                         RdmaMemoryRegion *zero_copy_region;
-                        if (c.size_<=HPX_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
+                        if (c.size_<=HPX_WITH_PARCELPORT_VERBS_MEMORY_COPY_THRESHOLD) {
                             zero_copy_region = chunk_pool_->allocateRegion(std::max(c.size_, (std::size_t)DEFAULT_MEMORY_POOL_CHUNK_SIZE));
                             char *zero_copy_memory = (char*)(zero_copy_region->getAddress());
                             std::memcpy(zero_copy_memory, c.data_.cpos_, c.size_);
@@ -1094,25 +1094,25 @@ struct plugin_config_data<hpx::parcelset::policies::verbs::parcelport> {
         FUNC_END_DEBUG_MSG;
 
         //      LOG_DEBUG_MSG("\n"
-        //          "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-        //          "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-        //          "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
+        //          "ifname = ${HPX_WITH_PARCELPORT_VERBS_IFNAME:" HPX_WITH_PARCELPORT_VERBS_IFNAME "}\n"
+        //          "device = ${HPX_WITH_PARCELPORT_VERBS_DEVICE:" HPX_WITH_PARCELPORT_VERBS_DEVICE "}\n"
+        //          "interface = ${HPX_WITH_PARCELPORT_VERBS_INTERFACE:" HPX_WITH_PARCELPORT_VERBS_INTERFACE "}\n"
         //          "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-        //          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+        //          BOOST_PP_STRINGIZE(HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
         //          "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-        //          BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+        //          BOOST_PP_STRINGIZE(HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
         //          "zero_copy_optimization = 0\n"
         //          "io_pool_size = 2\n"
         //          "use_io_pool = 1\n"
         //          "enable = 0");
         return
-                "ifname = ${HPX_PARCELPORT_VERBS_IFNAME:" HPX_PARCELPORT_VERBS_IFNAME "}\n"
-                "device = ${HPX_PARCELPORT_VERBS_DEVICE:" HPX_PARCELPORT_VERBS_DEVICE "}\n"
-                "interface = ${HPX_PARCELPORT_VERBS_INTERFACE:" HPX_PARCELPORT_VERBS_INTERFACE "}\n"
-                "memory_chunk_size = ${HPX_PARCEL_IBVERBS_MEMORY_CHUNK_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
-        "max_memory_chunks = ${HPX_PARCEL_IBVERBS_MAX_MEMORY_CHUNKS:"
-        BOOST_PP_STRINGIZE(HPX_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
+                "ifname = ${HPX_WITH_PARCELPORT_VERBS_IFNAME:" HPX_WITH_PARCELPORT_VERBS_IFNAME "}\n"
+                "device = ${HPX_WITH_PARCELPORT_VERBS_DEVICE:" HPX_WITH_PARCELPORT_VERBS_DEVICE "}\n"
+                "interface = ${HPX_WITH_PARCELPORT_VERBS_INTERFACE:" HPX_WITH_PARCELPORT_VERBS_INTERFACE "}\n"
+                "memory_chunk_size = ${HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE:"
+                BOOST_PP_STRINGIZE(HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE) "}\n"
+        "max_memory_chunks = ${HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS:"
+        BOOST_PP_STRINGIZE(HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS) "}\n"
         "zero_copy_optimization = 1\n"
         "io_pool_size = 2\n"
         "use_io_pool = 1\n"
