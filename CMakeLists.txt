@@ -399,9 +399,6 @@ if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
 ## Parcelport related build options
-hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
-  "Enable the ibverbs based parcelport. This is currently an experimental feature"
-  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_IPC BOOL
   "Enable the IPC (inter process communication) based parcelport. This is currently an experimental feature"
   OFF CATEGORY "Parcelport" ADVANCED)
@@ -413,18 +410,9 @@ hpx_option(HPX_WITH_PARCELPORT_TCP BOOL
   ON CATEGORY "Parcelport")
 
 ## ibverbs parcelport settings
-hpx_option(HPX_WITH_PARCELPORT_VERBS_IFNAME STRING
-  "The interface name of the ibverbs capable network adapter (default: ib0)"
-  "ib0" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_VERBS_MESSAGE_PAYLOAD STRING
-  "Size of the message payload not sent with RDMA (default: 512 byte)"
-  "512" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_VERBS_MEMORY_CHUNK_SIZE STRING
-  "Number of bytes a chunk in the memory pool can hold (default: 64MB)"
-  "67108864" CATEGORY "Parcelport" ADVANCED)
-hpx_option(HPX_WITH_PARCELPORT_VERBS_MAX_MEMORY_CHUNKS STRING
-  "Maximum number of chunks that can be allocated (default: 100)"
-  "100" CATEGORY "Parcelport" ADVANCED)
+hpx_option(HPX_WITH_PARCELPORT_VERBS BOOL
+  "Enable the ibverbs based parcelport. This is currently an experimental feature"
+  OFF CATEGORY "Parcelport" ADVANCED)
 
 ## mpi parcelport settings
 hpx_option(HPX_WITH_PARCELPORT_MPI_ENV STRING
