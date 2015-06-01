@@ -356,19 +356,19 @@ void test_wait_for_either_of_five_futures_1_from_list()
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
-    futures.push_back(boost::move(f1));
+    futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2(pt2.get_future());
-    futures.push_back(boost::move(f2));
+    futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3(pt3.get_future());
-    futures.push_back(boost::move(f3));
+    futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4(pt4.get_future());
-    futures.push_back(boost::move(f4));
+    futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5(pt5.get_future());
-    futures.push_back(boost::move(f5));
+    futures.push_back(std::move(f5));
 
     pt1();
 
@@ -398,19 +398,19 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 
     hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
     hpx::lcos::future<int> f1(pt1.get_future());
-    futures.push_back(boost::move(f1));
+    futures.push_back(std::move(f1));
     hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
     hpx::lcos::future<int> f2(pt2.get_future());
-    futures.push_back(boost::move(f2));
+    futures.push_back(std::move(f2));
     hpx::lcos::local::packaged_task<int()> pt3(make_int_slowly);
     hpx::lcos::future<int> f3(pt3.get_future());
-    futures.push_back(boost::move(f3));
+    futures.push_back(std::move(f3));
     hpx::lcos::local::packaged_task<int()> pt4(make_int_slowly);
     hpx::lcos::future<int> f4(pt4.get_future());
-    futures.push_back(boost::move(f4));
+    futures.push_back(std::move(f4));
     hpx::lcos::local::packaged_task<int()> pt5(make_int_slowly);
     hpx::lcos::future<int> f5(pt5.get_future());
-    futures.push_back(boost::move(f5));
+    futures.push_back(std::move(f5));
 
     pt1();
 
@@ -639,7 +639,7 @@ void test_wait_for_either_of_five_futures_5()
 //     hpx::lcos::future<int> fi2 = pt2.get_future();
 //     pt1.set_wait_callback(wait_callback_for_task);
 //
-//     hpx::thread t(boost::move(pt));
+//     hpx::thread t(std::move(pt));
 //
 //     boost::wait_for_any(fi, fi2);
 //     HPX_TEST_EQ(callback_called, 1U);
@@ -655,10 +655,10 @@ void test_wait_for_either_of_five_futures_5()
 //         hpx::lcos::future<int> futures[count];
 //         for(unsigned j = 0; j < count; ++j)
 //         {
-//             tasks[j] = boost::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
+//             tasks[j] = std::move(hpx::lcos::local::packaged_task<int()>(make_int_slowly));
 //             futures[j] = tasks[j].get_future();
 //         }
-//         hpx::thread t(boost::move(tasks[i]));
+//         hpx::thread t(std::move(tasks[i]));
 //
 //         hpx::lcos::wait_any(futures, futures);
 //
@@ -706,6 +706,27 @@ void test_wait_for_either_of_two_late_futures()
     HPX_TEST_EQ(hpx::util::get<1>(t).get(), 42);
 }
 
+void test_wait_for_either_of_two_deferred_futures()
+{
+    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+    hpx::lcos::future<int> f2 = hpx::async(hpx::launch::deferred, &make_int_slowly);
+
+    hpx::lcos::future<hpx::when_any_result<hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int> > > > r =
+        hpx::when_any(f1, f2);
+
+    HPX_TEST(!f1.valid());
+    HPX_TEST(!f2.valid());
+
+    hpx::util::tuple<
+        hpx::lcos::future<int>
+      , hpx::lcos::future<int> > t = r.get().futures;
+
+    HPX_TEST(hpx::util::get<0>(t).is_ready());
+    HPX_TEST_EQ(hpx::util::get<0>(t).get(), 42);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -734,6 +755,7 @@ int hpx_main(variables_map&)
 //         test_wait_for_either_invokes_callbacks();
 //         test_wait_for_any_from_range();
         test_wait_for_either_of_two_late_futures();
+        test_wait_for_either_of_two_deferred_futures();
     }
 
     hpx::finalize();
