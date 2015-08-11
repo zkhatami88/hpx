@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename InIter, typename T_,
                 typename Reduce, typename Convert>
             static T
-            sequential(ExPolicy const&, InIter first, InIter last,
+            sequential(ExPolicy, InIter first, InIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 typedef typename std::iterator_traits<InIter>::value_type
@@ -64,7 +64,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             template <typename ExPolicy, typename FwdIter, typename T_,
                 typename Reduce, typename Convert>
             static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 T_ && init, Reduce && r, Convert && conv)
             {
                 if (first == last)
@@ -84,7 +84,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         T val = conv(*part_begin);
                         return util::accumulate_n(++part_begin, --part_size,
                             std::move(val),
-                            [&r, &conv](T const& res, reference next)
+                            // MSVC14 bails out if r and conv are captured by
+                            // reference
+                            [=](T const& res, reference next)
                             {
                                 return r(res, conv(next));
                             });

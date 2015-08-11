@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM)
 #define HPX_PARALLEL_ALGORITHMS_SET_OPERATION_MAR_06_2015_0704PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
 #include <hpx/parallel/execution_policy.hpp>
@@ -16,6 +16,7 @@
 
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_scalar.hpp>
+#include <boost/shared_array.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {
@@ -65,7 +66,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
     template <typename ExPolicy, typename RanIter1, typename RanIter2,
         typename OutIter, typename F, typename Combiner, typename SetOp>
     typename util::detail::algorithm_result<ExPolicy, OutIter>::type
-    set_operation(ExPolicy const& policy,
+    set_operation(ExPolicy policy,
         RanIter1 first1, RanIter1 last1, RanIter2 first2, RanIter2 last2,
         OutIter dest, F && f, Combiner && combiner, SetOp && setop)
     {
@@ -184,5 +185,3 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 }}}}
 
 #endif
-
-

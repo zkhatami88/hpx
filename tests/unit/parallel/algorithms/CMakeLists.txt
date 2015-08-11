@@ -4,6 +4,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    adjacentdifference
     adjacentfind
     adjacentfind_binary
     all_of
@@ -26,13 +27,18 @@ set(tests
     findifnot
     foreach
     foreach_executors
+    foreach_projection
     foreachn
+    foreachn_projection
     generate
     generaten
     includes
     inclusive_scan
+    inclusive_scan_executors
+    inner_product
     is_partitioned
     is_sorted
+    is_sorted_executors
     is_sorted_until
     lexicographical_compare
     max_element
@@ -62,10 +68,12 @@ set(tests
     swapranges
     transform
     transform_binary
+    transform_binary2
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
     uninitialized_copy
+    uninitialized_copy_executors
     uninitialized_copyn
     uninitialized_fill
     uninitialized_filln

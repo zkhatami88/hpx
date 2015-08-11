@@ -42,7 +42,7 @@ namespace hpx
             apply_cb<Action>(
                 boost::make_shared<
                     hpx::actions::typed_continuation<continuation_result_type>
-                >(p.get_gid(), std::forward<Cont>(cont))
+                >(p.get_id(), std::forward<Cont>(cont))
               , target, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
             return p.get_future();
         }
@@ -59,7 +59,7 @@ namespace hpx
         Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;
@@ -100,7 +100,7 @@ namespace hpx
         Ts&&... vs)
     {
         typedef
-            typename traits::promise_local_result<
+            typename traits::promise_remote_result<
                 typename detail::result_of_async_continue<Action, Cont>::type
             >::type
         result_type;

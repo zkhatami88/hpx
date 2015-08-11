@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/util/backtrace.hpp>
 #endif
@@ -240,6 +241,24 @@ namespace hpx { namespace threads
     }
 #endif
 
+    ////////////////////////////////////////////////////////////////////////////
+    struct continuation_recursion_count_tag {};
+    static util::thread_specific_ptr<
+            std::size_t, continuation_recursion_count_tag
+        > continuation_recursion_count;
+
+    std::size_t& get_continuation_recursion_count()
+    {
+        thread_self* self_ptr = get_self_ptr();
+        if (self_ptr)
+            return self_ptr->get_continuation_recursion_count();
+
+        if (0 == continuation_recursion_count.get())
+            continuation_recursion_count.reset(new std::size_t(0));
+
+        return *continuation_recursion_count.get();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
@@ -396,7 +415,8 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_backtrace(id, bt);
     }
 
-    threads::executor get_executor(thread_id_type const& id, error_code& ec)
+    threads::executors::generic_thread_pool_executor
+        get_executor(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -404,7 +424,7 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, invalid_status,
                 "hpx::threads::get_executor",
                 "global applier object is not accessible");
-            return default_executor();
+            return threads::executors::generic_thread_pool_executor(0);
         }
 
         return app->get_thread_manager().get_executor(id, ec);
@@ -575,6 +595,13 @@ namespace hpx { namespace this_thread
             ec = make_success_code();
 
         return statex;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    threads::executors::generic_thread_pool_executor
+        get_executor(error_code& ec)
+    {
+        return threads::get_executor(threads::get_self_id(), ec);
     }
 }}
 

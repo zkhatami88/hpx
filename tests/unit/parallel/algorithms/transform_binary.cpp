@@ -14,7 +14,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary(ExPolicy const& policy, IteratorTag)
+void test_transform_binary(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -32,9 +32,14 @@ void test_transform_binary(ExPolicy const& policy, IteratorTag)
             return v1 + v2;
         };
 
-    hpx::parallel::transform(policy,
-        iterator(boost::begin(c1)), iterator(boost::end(c1)),
-        boost::begin(c2), boost::begin(d1), add);
+    hpx::util::tuple<iterator, base_iterator, base_iterator> result =
+        hpx::parallel::transform(policy,
+            iterator(boost::begin(c1)), iterator(boost::end(c1)),
+            boost::begin(c2), boost::begin(d1), add);
+
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c1)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(c2));
+    HPX_TEST(hpx::util::get<2>(result) == boost::end(d1));
 
     // verify values
     std::vector<std::size_t> d2(c1.size());
@@ -52,7 +57,7 @@ void test_transform_binary(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary_async(ExPolicy const& p, IteratorTag)
+void test_transform_binary_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -68,11 +73,16 @@ void test_transform_binary_async(ExPolicy const& p, IteratorTag)
             return v1 + v2;
         };
 
-    hpx::future<base_iterator> f =
+    hpx::future<hpx::util::tuple<iterator, base_iterator, base_iterator> > f =
         hpx::parallel::transform(p,
             iterator(boost::begin(c1)), iterator(boost::end(c1)),
             boost::begin(c2), boost::begin(d1), add);
     f.wait();
+
+    hpx::util::tuple<iterator, base_iterator, base_iterator> result = f.get();
+    HPX_TEST(hpx::util::get<0>(result) == iterator(boost::end(c1)));
+    HPX_TEST(hpx::util::get<1>(result) == boost::end(c2));
+    HPX_TEST(hpx::util::get<2>(result) == boost::end(d1));
 
     // verify values
     std::vector<std::size_t> d2(c1.size());
@@ -118,7 +128,7 @@ void transform_binary_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
+void test_transform_binary_exception(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -154,7 +164,7 @@ void test_transform_binary_exception(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary_exception_async(ExPolicy const& p, IteratorTag)
+void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -168,7 +178,7 @@ void test_transform_binary_exception_async(ExPolicy const& p, IteratorTag)
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), boost::begin(d1),
@@ -222,7 +232,7 @@ void transform_binary_exception_test()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
+void test_transform_binary_bad_alloc(ExPolicy policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::parallel::is_execution_policy<ExPolicy>::value);
 
@@ -257,7 +267,7 @@ void test_transform_binary_bad_alloc(ExPolicy const& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_transform_binary_bad_alloc_async(ExPolicy const& p, IteratorTag)
+void test_transform_binary_bad_alloc_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -271,7 +281,7 @@ void test_transform_binary_bad_alloc_async(ExPolicy const& p, IteratorTag)
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;
     try {
-        hpx::future<base_iterator> f =
+        hpx::future<void> f =
             hpx::parallel::transform(p,
                 iterator(boost::begin(c1)), iterator(boost::end(c1)),
                 boost::begin(c2), boost::begin(d1),

@@ -8,13 +8,15 @@
 #if !defined(HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM)
 #define HPX_PARALLEL_DETAIL_ADJACENT_FIND_SEP_20_2014_0731PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -40,7 +42,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 
             template <typename ExPolicy, typename Pred>
             static FwdIter
-            sequential(ExPolicy const&, FwdIter first, FwdIter last, Pred && op)
+            sequential(ExPolicy, FwdIter first, FwdIter last, Pred && op)
             {
                 return std::adjacent_find(first, last, op);
             }
@@ -49,7 +51,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             static typename util::detail::algorithm_result<
                 ExPolicy, FwdIter
             >::type
-            parallel(ExPolicy const& policy, FwdIter first, FwdIter last,
+            parallel(ExPolicy policy, FwdIter first, FwdIter last,
                 Pred && op)
             {
                 typedef hpx::util::zip_iterator<FwdIter, FwdIter> zip_iterator;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //
@@ -17,6 +17,7 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/executors/generic_thread_pool_executor.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -49,7 +50,8 @@ namespace hpx { namespace threads
         /// \brief return the number of HPX-threads with the given state
         virtual boost::int64_t get_thread_count(
             thread_state_enum state = unknown,
-            thread_priority priority = thread_priority_default) const = 0;
+            thread_priority priority = thread_priority_default,
+            std::size_t num_thread = std::size_t(-1), bool reset = false) const = 0;
 
         // \brief Abort all threads which are in suspended state. This will set
         //        the state of all suspended threads to \a pending while
@@ -470,18 +472,11 @@ namespace hpx { namespace threads
         virtual mask_cref_type get_used_processing_units() const = 0;
 
         // Return the executor associated with th egiven thread
-        virtual executor get_executor(thread_id_type const& id, error_code& ec) const = 0;
+        virtual executors::generic_thread_pool_executor
+            get_executor(thread_id_type const& id, error_code& ec) const = 0;
 
         ///////////////////////////////////////////////////////////////////////
-        static std::size_t get_worker_thread_num(bool* numa_sensitive = 0);
-
-        void init_tss(std::size_t thread_num, bool numa_sensitive);
-        void deinit_tss();
-
-    private:
-        // the TSS holds the number associated with a given OS thread
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> thread_num_;
+        virtual std::size_t get_worker_thread_num(bool* numa_sensitive = 0) = 0;
     };
 }}
 
