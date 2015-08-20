@@ -45,8 +45,8 @@ namespace hpx { namespace parcelset
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
 
-                chunks[first] = serialization::create_pointer_chunk(
-                        buffer.chunks_[i].data(), second);
+                chunks[first] = serialization::create_buffer_chunk(
+                        buffer.chunks_[i]);
             }
 
             std::size_t index = 0;

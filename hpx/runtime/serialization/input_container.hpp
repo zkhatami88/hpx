@@ -13,6 +13,8 @@
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>
 
+#include <boost/shared_array.hpp>
+
 #include <cstddef> // for size_t
 #include <cstring> // for memcpy
 #include <vector>
@@ -135,7 +137,10 @@ namespace hpx { namespace serialization
             }
             else {
                 HPX_ASSERT(current_chunk_ != std::size_t(-1));
-                HPX_ASSERT(get_chunk_type(current_chunk_) == chunk_type_pointer);
+                HPX_ASSERT(
+                    get_chunk_type(current_chunk_) == chunk_type_pointer
+                 || get_chunk_type(current_chunk_) == chunk_type_buffer
+                );
 
                 if (get_chunk_size(current_chunk_) != count)
                 {
@@ -148,9 +153,59 @@ namespace hpx { namespace serialization
                 // unfortunately we can't implement a zero copy policy on
                 // the receiving end
                 // as the memory was already allocated by the serialization code
-                std::memcpy(address, get_chunk_data(current_chunk_).pos_, count);
+                switch (get_chunk_type(current_chunk_))
+                {
+                    case chunk_type_pointer:
+                        std::memcpy(address, get_chunk_data(current_chunk_).pos_, count);
+                        break;
+                    case chunk_type_buffer:
+                        std::memcpy(address, get_chunk_data(current_chunk_).buf_->get(), count);
+                        break;
+                }
                 ++current_chunk_;
             }
+        }
+
+        boost::shared_array<char> get_binary_chunk(std::size_t count)
+        {
+            HPX_ASSERT((boost::int64_t)count >= 0);
+
+            boost::shared_array<char> res;
+
+            if (filter_.get() || chunks_ == 0 ||
+                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD) {
+                res.reset(new char[count]);
+                this->input_container::load_binary(res.get(), count);
+            }
+            else {
+                HPX_ASSERT(
+                    get_chunk_type(current_chunk_) == chunk_type_pointer
+                 || get_chunk_type(current_chunk_) == chunk_type_buffer
+                );
+
+                if (get_chunk_size(current_chunk_) != count)
+                {
+                    HPX_THROW_EXCEPTION(serialization_error
+                      , "input_container::get_binary_chunk"
+                      , "archive data bstream data chunk size mismatch");
+                    return res;
+                }
+
+                switch (get_chunk_type(current_chunk_))
+                {
+                    case chunk_type_pointer:
+                        res.reset(new char[count]);
+                        std::memcpy(res.get(), get_chunk_data(current_chunk_).pos_, count);
+                        break;
+                    case chunk_type_buffer:
+                        res = *get_chunk_data(current_chunk_).buf_;
+                        get_chunk_data(current_chunk_).buf_->reset();
+                        break;
+                }
+
+                ++current_chunk_;
+            }
+            return res;
         }
 
         Container const& cont_;

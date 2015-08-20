@@ -219,6 +219,22 @@ namespace hpx { namespace serialization
             size_ += count;
         }
 
+        template <typename T>
+        typename std::enable_if<
+            traits::is_bitwise_serializable<T>::value
+          , boost::shared_array<T>
+        >::type
+        get_binary_chunk(std::size_t count)
+        {
+            boost::shared_array<char> ptr = buffer_->get_binary_chunk(count);
+
+            return
+                boost::shared_array<T>(
+                    static_cast<T*>(ptr.get())
+                  , [ptr](void *) mutable {ptr.reset();}
+                );
+        }
+
         std::size_t bytes_read() const
         {
             return size_;

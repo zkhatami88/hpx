@@ -7,6 +7,10 @@
 #ifndef HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 #define HPX_SERIALIZATION_SERIALIZATION_CHUNK_HPP
 
+#include <hpx/runtime/serialization/serialize_buffer_fwd.hpp>
+
+#include <boost/shared_array.hpp>
+
 #include <cstddef>
 #include <climits>
 #include <cstring>
@@ -24,15 +28,17 @@ namespace hpx { namespace serialization
     ///////////////////////////////////////////////////////////////////////
     union chunk_data
     {
-        std::size_t index_;     // position inside the data buffer //-V117
-        void const* cpos_;      // const pointer to external data buffer //-V117
-        void* pos_;             // pointer to external data buffer //-V117
+        std::size_t index_;              // position inside the data buffer //-V117
+        void const* cpos_;               // const pointer to external data buffer //-V117
+        void* pos_;                      // pointer to external data buffer //-V117
+        boost::shared_array<char>* buf_; // buffer to serialization chunk
     };
 
     enum chunk_type
     {
         chunk_type_index = 0,
-        chunk_type_pointer = 1
+        chunk_type_pointer = 1,
+        chunk_type_buffer = 2
     };
 
     struct serialization_chunk
@@ -59,6 +65,17 @@ namespace hpx { namespace serialization
             { 0 }, size, static_cast<boost::uint8_t>(chunk_type_pointer)
         };
         retval.data_.cpos_ = pos;
+        return retval;
+    }
+
+    template <typename Allocator>
+    inline serialization_chunk create_buffer_chunk(
+        serialize_buffer<char, Allocator> & buf)
+    {
+        serialization_chunk retval = {
+            { 0 }, buf.size(), static_cast<boost::uint8_t>(chunk_type_buffer)
+        };
+        retval.data_.buf_ = &detail::get_shared_buffer_data(buf);
         return retval;
     }
 

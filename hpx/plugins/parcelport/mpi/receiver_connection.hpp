@@ -9,6 +9,7 @@
 #include <hpx/plugins/parcelport/mpi/header.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/runtime/parcelset/parcel_buffer.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <hpx/util/memory_chunk_pool.hpp>
 #include <hpx/util/memory_chunk_pool_allocator.hpp>
@@ -40,7 +41,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef
             std::vector<char, allocator_type>
             data_type;
-        typedef parcel_buffer<data_type, data_type> buffer_type;
+        typedef
+            serialization::serialize_buffer<char, allocator_type>
+            chunk_type;
+        typedef
+            parcel_buffer<
+                data_type
+              , chunk_type
+            >
+            buffer_type;
 
     public:
         receiver_connection(
@@ -103,7 +112,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             );
             if(num_zero_copy_chunks != 0)
             {
-                buffer_.chunks_.resize(num_zero_copy_chunks, data_type(allocator_));
+                buffer_.chunks_.resize(num_zero_copy_chunks, chunk_type(allocator_));
                 {
                     util::mpi_environment::scoped_lock l;
                     MPI_Irecv(
@@ -165,7 +174,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 std::size_t idx = chunks_idx_++;
                 std::size_t chunk_size = buffer_.transmission_chunks_[idx].second;
 
-                data_type & c = buffer_.chunks_[idx];
+                chunk_type & c = buffer_.chunks_[idx];
                 c.resize(chunk_size);
                 {
                     util::mpi_environment::scoped_lock l;

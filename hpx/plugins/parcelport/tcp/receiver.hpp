@@ -15,6 +15,7 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
+#include <hpx/runtime/serialization/serialize_buffer.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 
@@ -40,7 +41,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
+      : public parcelport_connection<
+            receiver
+          , std::vector<char>
+          , serialization::serialize_buffer<char>
+        >
     {
         typedef hpx::lcos::local::spinlock mutex_type;
     public:

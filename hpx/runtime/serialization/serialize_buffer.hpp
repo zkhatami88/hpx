@@ -6,12 +6,11 @@
 #if !defined(HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM)
 #define HPX_SERIALIZATION_SERIALIZE_BUFFER_APR_05_2013_0312PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/bind.hpp>
 
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
-#include <hpx/runtime/serialization/allocator.hpp>
+#include <hpx/runtime/serialization/serialize_buffer_fwd.hpp>
 
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
@@ -20,13 +19,8 @@
 
 namespace hpx { namespace serialization
 {
-    namespace detail
-    {
-        struct serialize_buffer_no_allocator {};
-    }
-
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Allocator = detail::serialize_buffer_no_allocator>
+    template <typename T, typename Allocator>
     class serialize_buffer
     {
     private:
@@ -212,6 +206,24 @@ namespace hpx { namespace serialization
             }
         }
 
+        void resize(std::size_t size)
+        {
+            boost::shared_array<T> data;
+            using util::placeholders::_1;
+            data.reset(alloc_.allocate(size),
+                util::bind(&serialize_buffer::deleter<allocator_type>,
+                    _1, alloc_, size_));
+
+            if(size != 0)
+            {
+                std::size_t num_copies = (std::min)(size, size_);
+                std::copy(data_.get(), data_.get() + num_copies, data.get());
+            }
+
+            size_ = size;
+            data_ = data;
+        }
+
         // accessors enabling data access
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
@@ -246,14 +258,24 @@ namespace hpx { namespace serialization
             using util::placeholders::_1;
             ar >> size_ >> alloc_; //-V128
 
+            load(ar, typename traits::is_bitwise_serializable<T>::type());
+        }
+        template <typename Archive>
+        void load(Archive& ar, boost::mpl::true_)
+        {
+            if(size_ == 0) return;
+            data_ = ar.template get_binary_chunk<T>(size_);
+        }
+
+        template <typename Archive>
+        void load(Archive& ar, boost::mpl::false_)
+        {
             data_.reset(alloc_.allocate(size_),
                 util::bind(&serialize_buffer::deleter<allocator_type>, _1,
                     alloc_, size_));
 
-            if (size_ != 0)
-            {
-                ar >> hpx::serialization::make_array(data_.get(), size_);
-            }
+            if(size_ == 0) return;
+            ar >> hpx::serialization::make_array(data_.get(), size_);
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -269,6 +291,9 @@ namespace hpx { namespace serialization
         boost::shared_array<T> data_;
         std::size_t size_;
         Allocator alloc_;
+
+        template <typename U, typename A>
+        friend boost::shared_array<U> & detail::get_shared_buffer_data(serialize_buffer<U, A> & buf);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -393,6 +418,21 @@ namespace hpx { namespace serialization
                 std::copy(data, data + size, data_.get());
         }
 
+        void resize(std::size_t size)
+        {
+            boost::shared_array<T> data;
+            data.reset(new T[size], &serialize_buffer::array_delete);
+
+            if(size != 0)
+            {
+                std::size_t num_copies = (std::min)(size, size_);
+                std::copy(data_.get(), data_.get() + num_copies, data.get());
+            }
+
+            size_ = size;
+            data_ = data;
+        }
+
         // accessors enabling data access
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
@@ -425,12 +465,22 @@ namespace hpx { namespace serialization
         void load(Archive& ar, const unsigned int version)
         {
             ar >> size_; //-V128
-            data_.reset(new T[size_]);
+            load(ar, typename traits::is_bitwise_serializable<T>::type());
+        }
 
-            if (size_ != 0)
-            {
-                ar >> hpx::serialization::make_array(data_.get(), size_);
-            }
+        template <typename Archive>
+        void load(Archive& ar, boost::mpl::true_)
+        {
+            if(size_ == 0) return;
+            data_ = ar.template get_binary_chunk<T>(size_);
+        }
+
+        template <typename Archive>
+        void load(Archive& ar, boost::mpl::false_)
+        {
+            data_.reset(new T[size_]);
+            if(size_ == 0) return;
+            ar >> hpx::serialization::make_array(data_.get(), size_);
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -445,7 +495,19 @@ namespace hpx { namespace serialization
     private:
         boost::shared_array<T> data_;
         std::size_t size_;
+
+        template <typename U, typename A>
+        friend boost::shared_array<U> & detail::get_shared_buffer_data(serialize_buffer<U, A> & buf);
     };
+
+    namespace detail
+    {
+        template <typename T, typename Allocator>
+        boost::shared_array<T> & get_shared_buffer_data(serialize_buffer<T, Allocator> & buf)
+        {
+            return buf.data_;
+        }
+    }
 }}
 
 namespace hpx { namespace traits
