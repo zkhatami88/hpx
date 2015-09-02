@@ -23,6 +23,8 @@
 #include <hpx/components/security/signed_type.hpp>
 #endif
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
 {
@@ -379,7 +381,8 @@ namespace hpx { namespace applier
         error_code& ec) const
     {
         std::vector<naming::gid_type> raw_prefixes;
-        if (!parcel_handler_.get_raw_localities(raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_.get_raw_localities(raw_prefixes,
+            components::component_invalid, ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)
@@ -431,7 +434,7 @@ namespace hpx { namespace applier
     }
 
     // schedule threads based on given parcel
-    void applier::schedule_action(parcelset::parcel const& p)
+    void applier::schedule_action(parcelset::parcel p)
     {
         // fetch the set of destinations
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
@@ -439,21 +442,22 @@ namespace hpx { namespace applier
 #else
         std::size_t const size = p.size();
 #endif
-        naming::id_type const* ids = p.get_destinations();
-        naming::address const* addrs = p.get_destination_addrs();
+        naming::id_type const* ids = p.destinations();
+        naming::address const* addrs = p.addrs();
 
         // make sure the target has not been migrated away
         naming::resolver_client& client = hpx::naming::get_agas_client();
         if (client.was_object_migrated(ids, size))
         {
-            client.route(p, util::bind(&detail::parcel_sent_handler,
-                std::ref(parcel_handler_), util::placeholders::_1, p));
+            client.route(std::move(p), util::bind(&detail::parcel_sent_handler,
+                std::ref(parcel_handler_), util::placeholders::_1,
+                util::placeholders::_2));
             return;
         }
 
         // decode the action-type in the parcel
-        actions::continuation_type cont = p.get_continuation();
-        actions::action_type act = p.get_action();
+        std::unique_ptr<actions::continuation> cont = p.get_continuation();
+        actions::base_action * act = p.get_action();
 
 #if defined(HPX_HAVE_SECURITY)
         // we look up the certificate of the originating locality, no matter
@@ -478,7 +482,7 @@ namespace hpx { namespace applier
             caps_sender = cert.get_type().get_capability();
 #endif
         int comptype = act->get_component_type();
-        naming::gid_type dest = p.get_destination_locality();
+        naming::gid_type dest = p.destination_locality();
 
         // if the parcel carries a continuation it should be directed to a
         // single destination
@@ -532,30 +536,61 @@ namespace hpx { namespace applier
                       << addr.type_ << ") action_type(" << comptype
                       << ") parcel ("  << p << ")";
                 HPX_THROW_EXCEPTION(bad_component_type,
-                    "action_manager::fetch_parcel",
+                    "applier::schedule_action",
                     strm.str());
             }
 
-            // dispatch action, register work item either with or without
-            // continuation support
-            if (!cont) {
-                // No continuation is to be executed, register the plain
-                // action and the local-virtual address.
-                act->schedule_thread(ids[i], lva, threads::pending);
-            }
-            else {
-                // This parcel carries a continuation, register a wrapper
-                // which first executes the original thread function as
-                // required by the action and triggers the continuations
-                // afterwards.
-                act->schedule_thread(cont, ids[i], lva, threads::pending);
+//             if (!hpx::is_starting() && act->get_action_type() == actions::base_action::direct_action)
+//             {
+//                 // execute this action directly
+//                 if (!cont) {
+//                     // We should not allow any exceptions to escape the
+//                     // execution of the action.
+//                     try {
+//                         // No continuation has to be executed, execute the
+//                         // action.
+//                         act->get_thread_function(lva)(
+//                             threads::thread_state_ex(threads::wait_signaled));
+//                     }
+//                     catch (...) {
+//                         // report any errors locally
+//                         hpx::report_error(boost::current_exception());
+//                     }
+//                 }
+//                 else {
+//                     // This parcel carries a continuation, retrieve a wrapper
+//                     // which first executes the original thread function as
+//                     // required by the action and triggers the continuations
+//                     // afterwards. Does exception handling.
+//                     act->get_thread_function(std::move(cont), lva)(
+//                         threads::thread_state_ex(threads::wait_signaled));
+//                 }
+//             }
+//             else
+            {
+                // dispatch action, register work item either with or without
+                // continuation support
+                if (!cont) {
+                    // No continuation is to be executed, register the plain
+                    // action and the local-virtual address.
+                    act->schedule_thread(ids[i], lva, threads::pending);
+                }
+                else {
+                    // This parcel carries a continuation, register a wrapper
+                    // which first executes the original thread function as
+                    // required by the action and triggers the continuations
+                    // afterwards.
+                    act->schedule_thread(std::move(cont), ids[i], lva,
+                        threads::pending);
+                }
             }
         }
     }
 
     applier& get_applier()
     {
-        HPX_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        // should have been initialized
+        HPX_ASSERT(NULL != applier::applier_.get());
         return **applier::applier_;
     }
 

@@ -14,6 +14,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/is_executor_parameters.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors.hpp>
@@ -29,8 +30,6 @@
 
 #include <memory>
 #include <type_traits>
-
-#include <boost/static_assert.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
 {
@@ -145,7 +144,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor>::value ||
+                hpx::traits::is_threads_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 sequential_task_execution_policy, Executor,
@@ -196,9 +197,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return params;
         }
     };
-
-    /// Default sequential task execution policy object.
-    static sequential_task_execution_policy const seq_task;
 
     /// Extension: The class sequential_task_execution_policy_shim is an
     /// execution policy type used as a unique type to disambiguate parallel
@@ -272,7 +270,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor_>::value ||
+                hpx::traits::is_threads_executor<Executor_>::value);
 
             typedef typename rebind_executor<
                 sequential_task_execution_policy_shim, Executor_,
@@ -386,10 +386,10 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         ///
         /// \returns The new sequential_task_execution_policy
         ///
-        sequential_task_execution_policy const& operator()(
+        sequential_task_execution_policy operator()(
             task_execution_policy_tag tag) const
         {
-            return seq_task;
+            return sequential_task_execution_policy();
         }
 
         /// Create a new sequential_execution_policy from the given
@@ -412,7 +412,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor>::value ||
+                hpx::traits::is_threads_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 sequential_execution_policy, Executor, executor_parameters_type
@@ -531,7 +533,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor_>::value ||
+                hpx::traits::is_threads_executor<Executor_>::value);
 
             typedef typename rebind_executor<
                 sequential_execution_policy_shim, Executor_,
@@ -674,7 +678,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor>::value ||
+                hpx::traits::is_threads_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 parallel_task_execution_policy, Executor,
@@ -725,9 +731,6 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
             return params;
         }
     };
-
-    /// Default parallel task execution policy object.
-    static parallel_task_execution_policy const par_task;
 
     /// Extension: The class parallel_task_execution_policy_shim is an
     /// execution policy type used as a unique type to disambiguate parallel
@@ -800,7 +803,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor_>::value ||
+                hpx::traits::is_threads_executor<Executor_>::value);
 
             typedef typename rebind_executor<
                 parallel_task_execution_policy_shim, Executor_,
@@ -917,7 +922,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         parallel_task_execution_policy operator()(
             task_execution_policy_tag tag) const
         {
-            return par_task;
+            return parallel_task_execution_policy();
         }
 
         /// Create a new parallel_execution_policy referencing an executor and
@@ -935,7 +940,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor>::value ||
+                hpx::traits::is_threads_executor<Executor>::value);
 
             typedef typename rebind_executor<
                 parallel_execution_policy, Executor, executor_parameters_type
@@ -1054,7 +1061,9 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         >::type
         on(Executor_ && exec) const
         {
-            BOOST_STATIC_ASSERT(is_executor<Executor_>::value);
+            BOOST_STATIC_ASSERT(
+                hpx::traits::is_executor<Executor_>::value ||
+                hpx::traits::is_threads_executor<Executor_>::value);
 
             typedef typename rebind_executor<
                 parallel_execution_policy_shim, Executor_,

@@ -114,12 +114,12 @@ namespace hpx { namespace parcelset
                         // make sure this parcel ended up on the right locality
 #ifdef HPX_DEBUG
                         if(hpx::get_runtime_ptr() && hpx::get_locality())
-                            HPX_ASSERT(p.get_destination_locality() == hpx::get_locality());
+                            HPX_ASSERT(p.destination_locality() == hpx::get_locality());
 #endif
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
-                        pp.add_received_parcel(p);
+                        pp.add_received_parcel(std::move(p));
                         overall_add_parcel_time += timer.elapsed_nanoseconds() -
                             add_parcel_time;
                     }
@@ -189,7 +189,8 @@ namespace hpx { namespace parcelset
                     util::one_shot(&decode_message<Parcelport, Buffer>),
                     boost::ref(parcelport), std::move(buffer), 1),
                 "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
+                threads::pending, true, threads::thread_priority_boost,
+                parcelport.get_next_num_thread());
         }
         else
         {
@@ -207,7 +208,8 @@ namespace hpx { namespace parcelset
                     util::one_shot(&decode_message<Parcelport, Buffer>),
                     boost::ref(parcelport), std::move(buffer), 0),
                 "decode_parcels",
-                threads::pending, true, threads::thread_priority_boost);
+                threads::pending, true, threads::thread_priority_boost,
+                parcelport.get_next_num_thread());
         }
         else
         {

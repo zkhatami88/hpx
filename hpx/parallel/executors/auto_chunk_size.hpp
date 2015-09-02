@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/constant_chunk_size.hpp
+/// \file parallel/executors/auto_chunk_size.hpp
 
 #if !defined(HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM)
 #define HPX_PARALLEL_AUTO_CHUNK_SIZE_JUL_31_2015_0742PM
@@ -13,6 +13,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/executors/executor_parameter_traits.hpp>
+#include <hpx/parallel/executors/executor_information_traits.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 
@@ -60,7 +61,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
         std::size_t get_chunk_size(Executor& exec, F && f, std::size_t count)
         {
             std::size_t const cores =
-                executor_traits<Executor>::os_thread_count(exec);
+                executor_information_traits<Executor>::os_thread_count(exec);
 
             if (count > 100*cores)
             {
