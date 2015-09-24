@@ -12,6 +12,7 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/detail/async_implementations_fwd.hpp>
 #include <hpx/lcos/detail/async_colocated_fwd.hpp>
@@ -46,56 +47,38 @@ namespace hpx { namespace components
         /// Asynchronously create a new instance of a component
         template <typename ...Ts>
         static lcos::future<naming::id_type>
-        create_async(naming::id_type const& gid, Ts&&... vs)
+        create_async(naming::locality locality, Ts&&... vs)
         {
-            if (!naming::is_locality(gid))
-            {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "stubs::runtime_support::create_component_async",
-                    "The id passed as the first argument is not representing"
-                        " a locality");
-                return lcos::make_ready_future(naming::invalid_id);
-            }
-
             typedef server::create_component_action<
                 ServerComponent, typename hpx::util::decay<Ts>::type...
             > action_type;
-            return hpx::async<action_type>(gid, std::forward<Ts>(vs)...);
+            return hpx::async(locality, action_type(), std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         static lcos::future<std::vector<naming::id_type> >
-        bulk_create_async(naming::id_type const& gid, std::size_t count,
+        bulk_create_async(naming::locality locality, std::size_t count,
             Ts&&... vs)
         {
-            if (!naming::is_locality(gid))
-            {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "stubs::runtime_support::bulk_create_component_async",
-                    "The id passed as the first argument is not representing"
-                        " a locality");
-                return lcos::make_ready_future(std::vector<naming::id_type>());
-            }
-
             typedef server::bulk_create_component_action<
                 ServerComponent, typename hpx::util::decay<Ts>::type...
             > action_type;
-            return hpx::async<action_type>(gid, count,
+            return hpx::async(locality, action_type(), count,
                 std::forward<Ts>(vs)...);
         }
 
         template <typename ...Ts>
         static naming::id_type create(
-            naming::id_type const& gid, Ts&&... vs)
+            naming::locality locality, Ts&&... vs)
         {
-            return create_async(gid, std::forward<Ts>(vs)...).get();
+            return create_async(locality, std::forward<Ts>(vs)...).get();
         }
 
         template <typename ...Ts>
         static std::vector<naming::id_type> bulk_create(
-            naming::id_type const& gid, std::size_t count, Ts&&... vs)
+            naming::locality locality, std::size_t count, Ts&&... vs)
         {
-            return bulk_create_async(gid, count, std::forward<Ts>(vs)...).get();
+            return bulk_create_async(locality, count, std::forward<Ts>(vs)...).get();
         }
 
         template <typename ...Ts>

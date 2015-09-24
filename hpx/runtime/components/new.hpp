@@ -12,7 +12,7 @@
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/traits/is_client.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/runtime/components/default_distribution_policy.hpp>
 #include <hpx/runtime/components/client_base.hpp>
@@ -66,7 +66,7 @@ namespace hpx
     ///
     template <typename Component, typename ...Ts>
     <unspecified>
-    new_(id_type const& locality, Ts&&... vs);
+    new_(naming::locality const& locality, Ts&&... vs);
 
     /// \brief Create multiple new instances of the given Component type on the
     /// specified locality.
@@ -112,7 +112,7 @@ namespace hpx
     ///
     template <typename Component, typename ...Ts>
     <unspecified>
-    new_(id_type const& locality, std::size_t count, Ts&&... vs);
+    new_(naming::locality const& locality, std::size_t count, Ts&&... vs);
 
     /// \brief Create one or more new instances of the given Component type
     /// based on the given distribution policy.
@@ -215,7 +215,7 @@ namespace hpx { namespace components
             typedef hpx::future<hpx::id_type> type;
 
             template <typename ...Ts>
-            static type call(hpx::id_type const& locality, Ts&&... vs)
+            static type call(hpx::naming::locality const& locality, Ts&&... vs)
             {
                 using components::stub_base;
                 return stub_base<Component>::create_async(
@@ -236,7 +236,7 @@ namespace hpx { namespace components
             typedef hpx::future<std::vector<hpx::id_type> > type;
 
             template <typename ...Ts>
-            static type call(hpx::id_type const& locality, std::size_t count,
+            static type call(hpx::naming::locality const& locality, std::size_t count,
                 Ts&&... vs)
             {
                 using components::stub_base;
@@ -279,7 +279,7 @@ namespace hpx { namespace components
         traits::is_component_or_component_array<Component>::value,
         detail::new_component<Component>
     >::type
-    new_(id_type const& locality, Ts&&... vs)
+    new_(naming::locality const& locality, Ts&&... vs)
     {
         return detail::new_component<Component>::call(
             locality, std::forward<Ts>(vs)...);
@@ -308,7 +308,7 @@ namespace hpx { namespace components
             typedef typename Client::server_component_type component_type;
 
             template <typename ...Ts>
-            static type call(hpx::id_type const& locality, Ts&&... vs)
+            static type call(hpx::naming::locality const& locality, Ts&&... vs)
             {
                 using components::stub_base;
                 return make_client<Client>(
@@ -355,7 +355,7 @@ namespace hpx { namespace components
         traits::is_client_or_client_array<Client>::value,
         detail::new_client<Client>
     >::type
-    new_(id_type const& locality, Ts&&... vs)
+    new_(naming::locality const& locality, Ts&&... vs)
     {
         return detail::new_client<Client>::call(
             locality, std::forward<Ts>(vs)...);
