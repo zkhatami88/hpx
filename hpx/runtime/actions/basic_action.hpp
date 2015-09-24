@@ -295,6 +295,15 @@ namespace hpx { namespace actions
             }
         };
 
+        template <typename ...Ts>
+        typename std::enable_if<
+            util::detail::are_tuples_compatible<
+                util::tuple<Args...>
+              , util::tuple<Ts&&...>
+            >::value
+          , local_result_type
+        >::type operator()(Ts&&...) const;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename ...Ts>
         BOOST_FORCEINLINE local_result_type operator()(
@@ -332,7 +341,8 @@ namespace hpx { namespace actions
         template <typename DistPolicy, typename ...Ts>
         BOOST_FORCEINLINE
         typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
+            traits::is_distribution_policy<DistPolicy>::value
+         || traits::is_executor<DistPolicy>::value,
             local_result_type
         >::type
         operator()(BOOST_SCOPED_ENUM(launch) policy,
@@ -348,7 +358,8 @@ namespace hpx { namespace actions
         template <typename DistPolicy, typename ...Ts>
         BOOST_FORCEINLINE
         typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
+            traits::is_distribution_policy<DistPolicy>::value
+         || traits::is_executor<DistPolicy>::value,
             local_result_type
         >::type
         operator()(DistPolicy const& dist_policy, error_code& ec,
@@ -361,7 +372,8 @@ namespace hpx { namespace actions
         template <typename DistPolicy, typename ...Ts>
         BOOST_FORCEINLINE
         typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
+            traits::is_distribution_policy<DistPolicy>::value
+         || traits::is_executor<DistPolicy>::value,
             local_result_type
         >::type
         operator()(BOOST_SCOPED_ENUM(launch) policy,
@@ -374,7 +386,8 @@ namespace hpx { namespace actions
         template <typename DistPolicy, typename ...Ts>
         BOOST_FORCEINLINE
         typename boost::enable_if_c<
-            traits::is_distribution_policy<DistPolicy>::value,
+            traits::is_distribution_policy<DistPolicy>::value
+         || traits::is_executor<DistPolicy>::value,
             local_result_type
         >::type
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const

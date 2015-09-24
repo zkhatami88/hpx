@@ -585,6 +585,14 @@ if(HPX_WITH_COMPONENT_GET_GID_COMPATIBILITY)
   hpx_add_config_define(HPX_HAVE_COMPONENT_GET_GID_COMPATIBILITY)
 endif()
 
+# HPX_WITH_ID_TYPE_COMPATIBILITY: introduced in V0.9.11
+hpx_option(HPX_WITH_ID_TYPE_COMPATIBILITY BOOL
+    "Enable backwards compatibility for hpx::naming::id_type"
+    ON ADVANCED)
+  if(HPX_WITH_ID_TYPE_COMPATIBILITY)
+    hpx_add_config_define(HPX_HAVE_ID_TYPE_COMPATIBILITY)
+endif()
+
 ################################################################################
 # Set basic search paths for HPX
 ################################################################################

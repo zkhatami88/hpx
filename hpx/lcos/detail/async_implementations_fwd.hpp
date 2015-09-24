@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/promise_local_result.hpp>
+#include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 
 namespace hpx { namespace detail

@@ -11,6 +11,7 @@ set(subdirs
     component
     diagnostics
     lcos
+    naming
     parcelset
     performance_counter
     serialization

@@ -28,6 +28,9 @@ namespace hpx { namespace util
         class deferred_call_impl //-V690
         {
         public:
+            typedef F func_type;
+            typedef Args args_type;
+
             // default constructor is needed for serialization
             deferred_call_impl()
             {}

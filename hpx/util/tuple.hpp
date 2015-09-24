@@ -143,6 +143,11 @@ namespace hpx { namespace util
           : std::false_type
         {};
 
+        template <>
+        struct are_tuples_compatible<tuple<>, tuple<> >
+          : std::true_type
+        {};
+
         template <typename ...Ts, typename UTuple>
         struct are_tuples_compatible<
             tuple<Ts...>, UTuple
