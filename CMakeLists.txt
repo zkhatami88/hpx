@@ -372,7 +372,7 @@ endif()
 
 hpx_option(HPX_WITH_THREAD_LOCAL_STORAGE BOOL
   "Enable thread local storage for all HPX threads (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED)
+  ON CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_THREAD_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_THREAD_LOCAL_STORAGE)
@@ -380,7 +380,7 @@ endif()
 
 hpx_option(HPX_WITH_SCHEDULER_LOCAL_STORAGE BOOL
   "Enable scheduler local storage for all HPX schedulers (default: OFF)"
-  OFF CATEGORY "Thread Manager" ADVANCED)
+  ON CATEGORY "Thread Manager" ADVANCED)
 
 if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
@@ -447,6 +447,9 @@ if(HPX_WITH_AGAS_DUMP_REFCNT_ENTRIES)
 endif()
 
 ## Parcelport related build options
+hpx_option(HPX_WITH_PARCELPORT_CCI BOOL
+  "Enable the CCI based parcelport. This is currently an experimental feature"
+  OFF CATEGORY "Parcelport" ADVANCED)
 hpx_option(HPX_WITH_PARCELPORT_IBVERBS BOOL
   "Enable the ibverbs based parcelport. This is currently an experimental feature"
   OFF CATEGORY "Parcelport" ADVANCED)

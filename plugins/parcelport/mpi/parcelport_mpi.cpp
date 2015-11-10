@@ -34,8 +34,6 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 
-#include <boost/archive/basic_archive.hpp>
-
 namespace hpx
 {
     bool is_starting();

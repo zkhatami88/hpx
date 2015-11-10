@@ -9,6 +9,7 @@
 set(parcelport_plugins
   #ibverbs
   #ipc
+  cci
   mpi
   tcp)
 
@@ -93,6 +94,7 @@ endforeach()
 macro(add_static_parcelports)
   add_parcelport_tcp_module()
   add_parcelport_mpi_module()
+  add_parcelport_cci_module()
 endmacro()
 
 macro(add_parcelport_modules)

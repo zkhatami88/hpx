@@ -228,7 +228,7 @@ namespace hpx { namespace serialization
         T* end() { return data() + size_; }
 
         T& operator[](std::size_t idx) { return data_[idx]; }
-        T operator[](std::size_t idx) const { return data_[idx]; }
+        T const& operator[](std::size_t idx) const { return data_[idx]; }
 
         boost::shared_array<T> data_array() const { return data_; }
 
