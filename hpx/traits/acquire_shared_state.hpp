@@ -10,6 +10,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
+
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 #include <hpx/traits/acquire_future.hpp>
@@ -20,7 +21,8 @@
 #include <iterator>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/range/functions.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 
 namespace hpx { namespace traits
 {

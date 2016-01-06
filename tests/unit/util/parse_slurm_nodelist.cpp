@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/util/batch_environment.hpp>
+#include <hpx/runtime_fwd.hpp>
 
 #include <iostream>
 

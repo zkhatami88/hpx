@@ -9,14 +9,15 @@
 #if !defined(HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9)
 #define HPX_0C9D09E0_725D_4FA6_A879_8226DE97C6B9
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/io_service_pool.hpp>
-#include <hpx/util/connection_cache.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <boost/lockfree/queue.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 

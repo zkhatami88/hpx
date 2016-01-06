@@ -8,7 +8,8 @@
 
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/include/performance_counters.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
+#include <hpx/performance_counters/counter_value.hpp>
 
 #include <string>
 #include <vector>

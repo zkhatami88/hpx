@@ -12,8 +12,8 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/performance_counters/counter_path_elements.hpp>
+#include <hpx/exception_fwd.hpp>
 
 #include <vector>
 #include <string>

@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_ACTIONS_INVOKE_NO_MORE_THAN_MAR_30_2014_0616PM)
 #define HPX_RUNTIME_ACTIONS_INVOKE_NO_MORE_THAN_MAR_30_2014_0616PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -84,7 +84,7 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, boost::mpl::false_)
+        call(naming::address_type lva, F && f, boost::mpl::false_)
         {
             typedef typename Action::component_type component_type;
 
@@ -108,7 +108,7 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F && f, boost::mpl::true_)
+        call(naming::address_type lva, F && f, boost::mpl::true_)
         {
             typedef typename Action::component_type component_type;
 
@@ -122,7 +122,7 @@ namespace hpx { namespace actions { namespace detail
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
         static threads::thread_function_type
-        call(naming::address::address_type lva, F&& f)
+        call(naming::address_type lva, F&& f)
         {
             typedef typename Action::result_type result_type;
             typedef typename traits::is_future<result_type>::type is_future;

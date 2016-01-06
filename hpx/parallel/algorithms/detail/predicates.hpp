@@ -6,8 +6,10 @@
 #if !defined(HPX_PARALLEL_DETAIL_PREDICATES_JUL_13_2014_0824PM)
 #define HPX_PARALLEL_DETAIL_PREDICATES_JUL_13_2014_0824PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
+
+#include <iterator>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
 {

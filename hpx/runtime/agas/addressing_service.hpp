@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
@@ -216,17 +215,17 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , boost::int64_t compensated_credit
         );
 
-    naming::address::address_type get_primary_ns_lva() const
+    naming::address_type get_primary_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
+        return reinterpret_cast<naming::address_type>(
             is_bootstrap() ?
                 get_bootstrap_primary_ns_ptr() :
                 get_hosted_primary_ns_ptr());
     }
 
-    naming::address::address_type get_symbol_ns_lva() const
+    naming::address_type get_symbol_ns_lva() const
     {
-        return reinterpret_cast<naming::address::address_type>(
+        return reinterpret_cast<naming::address_type>(
             is_bootstrap() ?
                 get_bootstrap_symbol_ns_ptr() :
                 get_hosted_symbol_ns_ptr());

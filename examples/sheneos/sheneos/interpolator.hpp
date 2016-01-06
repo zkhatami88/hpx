@@ -6,7 +6,6 @@
 #if !defined(HPX_SHENEOS_AUG_08_2011_1223PM)
 #define HPX_SHENEOS_AUG_08_2011_1223PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>

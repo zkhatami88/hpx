@@ -5,7 +5,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/components.hpp>

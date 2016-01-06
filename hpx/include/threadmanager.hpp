@@ -15,5 +15,7 @@
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
 
+#include <hpx/include/runtime_utils.hpp>
+
 #endif
 

@@ -7,6 +7,8 @@
 #define HPX_START_IMPL_OCT_04_2012_0252PM
 
 #include <hpx/hpx_start.hpp>
+#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 
 #include <hpx/util/find_prefix.hpp>
 

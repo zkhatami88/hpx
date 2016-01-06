@@ -4,10 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/performance_counters/registry.hpp>
+#include <hpx/runtime/get_num_localities.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
@@ -951,6 +952,22 @@ namespace hpx { namespace performance_counters
 
         counter_info info(name);          // set full counter name
         return get_counter_async(info, ec);
+    }
+
+    naming::id_type get_counter(counter_info const & info, error_code& ec)
+    {
+        lcos::future<naming::id_type> f = get_counter_async(info, ec);
+        if (ec) return naming::invalid_id;
+
+        return f.get(ec);
+    }
+
+    naming::id_type get_counter(std::string const & name, error_code& ec)
+    {
+        lcos::future<naming::id_type> f = get_counter_async(name, ec);
+        if (ec) return naming::invalid_id;
+
+        return f.get(ec);
     }
 }}
 

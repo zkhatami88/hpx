@@ -9,13 +9,11 @@
 #if !defined(HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM)
 #define HPX_RUNTIME_ACTIONS_PLAIN_ACTION_NOV_14_2008_0706PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -67,7 +65,7 @@ namespace hpx { namespace actions
 
         typedef void is_plain_action;
 
-        static std::string get_action_name(naming::address::address_type /*lva*/)
+        static std::string get_action_name(naming::address_type /*lva*/)
         {
             std::stringstream name;
             name << "plain action(" << detail::get_action_name<Derived>() << ")";
@@ -81,7 +79,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type /*lva*/, Ts&&... vs)
+        static R invoke(naming::address_type /*lva*/, Ts&&... vs)
         {
             basic_action<detail::plain_function, R(Ps...), Derived>::
                 increment_invocation_count();

@@ -13,6 +13,10 @@
 #include <hpx/util/bind_action.hpp>
 
 #include <hpx/include/async.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

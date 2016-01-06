@@ -4,13 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/util/ini.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/components/server/console_logging.hpp>
 
 #include <hpx/util/logging/format/named_write_fwd.hpp>
@@ -29,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This must be in global namespace
 HPX_REGISTER_ACTION_ID(
-    hpx::components::server::console_logging_action<>,
+    hpx::components::server::console_logging_action,
     console_logging_action,
     hpx::actions::console_logging_action_id)
 

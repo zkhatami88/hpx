@@ -509,7 +509,7 @@ namespace hpx { namespace naming
             return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
         }
 
-        inline void set_dont_store_in_cache(id_type& id)
+        inline void set_dont_store_in_cache(gid_type& id)
         {
             id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }

@@ -15,13 +15,17 @@
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/launch_policy.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/actions/detail/get_action_name.hpp>
+#include <hpx/runtime/actions/detail/remote_action_result.hpp>
+#include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/is_future.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -65,7 +69,7 @@ namespace hpx { namespace actions
         public:
             explicit continuation_thread_function(
                 std::unique_ptr<continuation> cont,
-                naming::address::address_type lva, F&& f, Ts&&... vs)
+                naming::address_type lva, F&& f, Ts&&... vs)
               : cont_(std::move(cont))
               , lva_(lva)
               , f_(std::forward<F>(f), std::forward<Ts>(vs)...)
@@ -89,7 +93,7 @@ namespace hpx { namespace actions
 
         private:
             std::unique_ptr<continuation> cont_;
-            naming::address::address_type lva_;
+            naming::address_type lva_;
             util::detail::deferred<F(Ts&&...)> f_;
         };
 
@@ -140,7 +144,7 @@ namespace hpx { namespace actions
         typedef void action_tag;
 
         ///////////////////////////////////////////////////////////////////////
-        static std::string get_action_name(naming::address::address_type /*lva*/)
+        static std::string get_action_name(naming::address_type /*lva*/)
         {
             std::stringstream name;
             name << "action(" << detail::get_action_name<Derived>() << ")";
@@ -153,7 +157,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type /*lva*/, Ts&&... /*vs*/);
+        static R invoke(naming::address_type /*lva*/, Ts&&... /*vs*/);
 
     protected:
         struct invoker
@@ -163,7 +167,7 @@ namespace hpx { namespace actions
                 (boost::is_void<R>::value && util::detail::pack<Ts...>::size >= 0),
                 result_type
             >::type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address_type lva, Ts&&... vs) const
             {
                 return Derived::invoke(lva, std::forward<Ts>(vs)...);
             }
@@ -173,7 +177,7 @@ namespace hpx { namespace actions
                 (boost::is_void<R>::value && util::detail::pack<Ts...>::size >= 0),
                 result_type
             >::type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address_type lva, Ts&&... vs) const
             {
                 Derived::invoke(lva, std::forward<Ts>(vs)...);
                 return util::unused;
@@ -189,7 +193,7 @@ namespace hpx { namespace actions
 
             template <typename ...Ts>
             HPX_FORCEINLINE result_type operator()(
-                naming::address::address_type lva, Ts&&... vs) const
+                naming::address_type lva, Ts&&... vs) const
             {
                 try {
                     LTM_(debug) << "Executing "
@@ -233,7 +237,7 @@ namespace hpx { namespace actions
         // case no continuation has been supplied.
         template <typename ...Ts>
         static threads::thread_function_type
-        construct_thread_function(naming::address::address_type lva,
+        construct_thread_function(naming::address_type lva,
             Ts&&... vs)
         {
             return traits::action_decorate_function<Derived>::call(lva,
@@ -248,10 +252,10 @@ namespace hpx { namespace actions
         template <typename ...Ts>
         static threads::thread_function_type
         construct_thread_function(std::unique_ptr<continuation> cont,
-            naming::address::address_type lva, Ts&&... vs)
+            naming::address_type lva, Ts&&... vs)
         {
             typedef detail::continuation_thread_function<
-                Derived, invoker, naming::address::address_type&, Ts&&...
+                Derived, invoker, naming::address_type&, Ts&&...
             > thread_function;
 
             return traits::action_decorate_function<Derived>::call(lva,
@@ -262,7 +266,7 @@ namespace hpx { namespace actions
         // direct execution
         template <typename ...Ts>
         static HPX_FORCEINLINE result_type
-        execute_function(naming::address::address_type lva, Ts&&... vs)
+        execute_function(naming::address_type lva, Ts&&... vs)
         {
             LTM_(debug)
                 << "basic_action::execute_function"

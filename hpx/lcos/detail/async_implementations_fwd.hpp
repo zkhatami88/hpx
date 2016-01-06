@@ -12,6 +12,7 @@
 #include <hpx/traits/promise_local_result.hpp>
 #include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 

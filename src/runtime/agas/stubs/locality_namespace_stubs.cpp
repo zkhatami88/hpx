@@ -8,6 +8,7 @@
 
 #include <hpx/apply.hpp>
 #include <hpx/runtime/agas/stubs/locality_namespace.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 
 namespace hpx { namespace agas { namespace stubs
 {

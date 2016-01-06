@@ -9,11 +9,12 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
+#include <hpx/config.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <mpi.h>
 
-#include <hpx/hpx_fwd.hpp>
 #include <cstdlib>
 
 namespace hpx { namespace util

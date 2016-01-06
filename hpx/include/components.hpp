@@ -7,7 +7,6 @@
 #if !defined(HPX_COMPONENTS_JUN_01_2007_0526PM)
 #define HPX_COMPONENTS_JUN_01_2007_0526PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 
 #include <hpx/runtime/components/component_factory.hpp>
@@ -51,6 +50,8 @@
 #include <hpx/runtime/components/binpacking_distribution_policy.hpp>
 
 #include <hpx/runtime/get_ptr.hpp>
+
+#include <hpx/include/runtime_utils.hpp>
 
 #endif
 

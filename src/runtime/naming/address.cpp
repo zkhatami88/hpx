@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 
@@ -15,8 +15,8 @@ namespace hpx { namespace naming { namespace detail
     {
         gid_type locality_;
         address::component_type type_;
-        address::address_type address_;
-        address::address_type offset_;
+        address_type address_;
+        address_type offset_;
 
         template <class Archive>
         void serialize(Archive& ar, unsigned)

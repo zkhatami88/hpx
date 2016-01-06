@@ -12,5 +12,7 @@
 #include <hpx/lcos/detail/async_colocated.hpp>
 #include <hpx/lcos/detail/async_colocated_callback.hpp>
 
+#include <hpx/include/runtime_utils.hpp>
+
 #endif
 

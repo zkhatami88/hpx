@@ -9,10 +9,14 @@
 #define HPX_THREADS_THREAD_DATA_FWD_AUG_11_2015_0228PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/threads/executor_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/util/unique_function.hpp>
+#include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl.hpp>
+#include <hpx/util/unique_function.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 namespace hpx { namespace util { namespace coroutines
 {
@@ -41,15 +45,15 @@ namespace hpx { namespace threads
     /// \cond NOINTERNAL
     struct HPX_EXPORT threadmanager_base;
     class HPX_EXPORT thread_data;
+    class thread_init_data;
 
     template <typename SchedulingPolicy>
     class HPX_EXPORT threadmanager_impl;
 
     typedef thread_state_enum thread_function_sig(thread_state_ex_enum);
+
     typedef util::unique_function_nonser<thread_function_sig>
         thread_function_type;
-
-    class HPX_EXPORT executor;
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail

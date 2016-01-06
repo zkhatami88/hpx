@@ -12,7 +12,7 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>

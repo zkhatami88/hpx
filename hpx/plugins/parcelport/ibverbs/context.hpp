@@ -9,13 +9,12 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/plugins/parcelport/ibverbs/helper.hpp>
 #include <hpx/plugins/parcelport/ibverbs/client.hpp>
 #include <hpx/plugins/parcelport/ibverbs/server.hpp>
 #include <hpx/plugins/parcelport/ibverbs/data_buffer.hpp>
-#include <hpx/util/detail/yield_k.hpp>
 #include <hpx/apply.hpp>
 
 #include <boost/asio/basic_io_object.hpp>

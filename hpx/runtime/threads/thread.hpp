@@ -5,18 +5,18 @@
 #if !defined(HPX_THREADS_THREAD_APR_10_2012_0145PM)
 #define HPX_THREADS_THREAD_APR_10_2012_0145PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/thread/locks.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <iosfwd>
+#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -185,57 +185,10 @@ namespace hpx
     namespace this_thread
     {
         HPX_API_EXPORT thread::id get_id() HPX_NOEXCEPT;
-
-        HPX_API_EXPORT void yield() HPX_NOEXCEPT;
-
-        // extensions
-        HPX_API_EXPORT threads::thread_priority get_priority();
-        HPX_API_EXPORT std::ptrdiff_t get_stack_size();
-
-        HPX_API_EXPORT void interruption_point();
-        HPX_API_EXPORT bool interruption_enabled();
-        HPX_API_EXPORT bool interruption_requested();
-
-        HPX_API_EXPORT void interrupt();
-
-        HPX_API_EXPORT void sleep_until(util::steady_time_point const& abs_time);
-
-        inline void sleep_for(util::steady_duration const& rel_time)
-        {
-            sleep_until(rel_time.from_now());
-        }
-
-        HPX_API_EXPORT std::size_t get_thread_data();
-        HPX_API_EXPORT std::size_t set_thread_data(std::size_t);
-
-        class HPX_EXPORT disable_interruption
-        {
-        private:
-            disable_interruption(disable_interruption const&);
-            disable_interruption& operator=(disable_interruption const&);
-
-            bool interruption_was_enabled_;
-            friend class restore_interruption;
-
-        public:
-            disable_interruption();
-            ~disable_interruption();
-        };
-
-        class HPX_EXPORT restore_interruption
-        {
-        private:
-            restore_interruption(restore_interruption const&);
-            restore_interruption& operator=(restore_interruption const&);
-
-            bool interruption_was_enabled_;
-
-        public:
-            explicit restore_interruption(disable_interruption& d);
-            ~restore_interruption();
-        };
     }
 }
+
+#include <hpx/runtime/threads/this_thread.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>
 

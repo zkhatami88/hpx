@@ -16,5 +16,7 @@
 #include <hpx/runtime/serialization/string.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
+#include <hpx/runtime/serialization/detail/size_gatherer_container.hpp>
+#include <hpx/runtime/serialization/detail/future_await_container.hpp>
 
 #endif

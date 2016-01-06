@@ -6,8 +6,6 @@
 #if !defined(HPX_UTIL_DEC_21_2011_0340PM)
 #define HPX_UTIL_DEC_21_2011_0340PM
 
-#include <hpx/hpx_fwd.hpp>
-
 #include <hpx/util/activate_counters.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>

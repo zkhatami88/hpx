@@ -47,6 +47,7 @@ namespace hpx
     /// \a hpx::error_code object with the behavior as specified above.
     ///
     HPX_EXCEPTION_EXPORT extern error_code throws;
+    /// \endcond
 }
 
 #endif

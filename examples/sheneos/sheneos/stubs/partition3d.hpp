@@ -6,7 +6,6 @@
 #if !defined(HPX_SHENEOS_PARTITION3D_AUG_08_2011_1219PM)
 #define HPX_SHENEOS_PARTITION3D_AUG_08_2011_1219PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 

@@ -7,25 +7,26 @@
 #if !defined(HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM)
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
-#if defined(HPX_HAVE_SECURITY)
-#include <hpx/lcos/local/spinlock.hpp>
-#endif
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate_store.hpp>
 #endif
 
-#include <boost/smart_ptr/scoped_ptr.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <memory>
@@ -60,8 +61,6 @@ namespace hpx
     int pre_main(runtime_mode);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename SchedulingPolicy>
-    class HPX_EXPORT runtime_impl;
 
 #if defined(HPX_HAVE_SECURITY)
     namespace detail
@@ -396,7 +395,7 @@ namespace hpx
 
         // certain components (such as PAPI) require all threads to be
         // registered with the library
-        boost::scoped_ptr<util::thread_mapper> thread_support_;
+        std::unique_ptr<util::thread_mapper> thread_support_;
 
         threads::policies::init_affinity_data affinity_init_;
         threads::topology& topology_;
@@ -407,8 +406,8 @@ namespace hpx
 
         boost::atomic<state> state_;
 
-        boost::scoped_ptr<components::server::memory> memory_;
-        boost::scoped_ptr<components::server::runtime_support> runtime_support_;
+        std::unique_ptr<components::server::memory> memory_;
+        std::unique_ptr<components::server::runtime_support> runtime_support_;
 
 #if defined(HPX_HAVE_SECURITY)
         // allocate dynamically to reduce dependencies

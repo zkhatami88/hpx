@@ -12,6 +12,7 @@
 
 #include <hpx/lcos/local/spinlock.hpp>
 
+#include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 #include <hpx/plugins/parcelport/mpi/sender_connection.hpp>
 #include <hpx/plugins/parcelport/mpi/tag_provider.hpp>
@@ -20,6 +21,8 @@
 #include <iterator>
 #include <memory>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi

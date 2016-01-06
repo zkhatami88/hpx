@@ -8,28 +8,34 @@
 #if !defined(HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM)
 #define HPX_PARCELSET_PARCELHANDLER_MAY_18_2008_0935AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/config.hpp>
+#include <hpx/config/emulate_deleted.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/applier_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
-
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/performance_counters/parcels/data_point.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/noncopyable.hpp>
-#include <boost/bind.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/locks.hpp>
 
-#include <map>
 #include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace hpx { namespace parcelset
 {
@@ -40,8 +46,9 @@ namespace hpx { namespace parcelset
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
-    class HPX_EXPORT parcelhandler : boost::noncopyable
+    class HPX_EXPORT parcelhandler
     {
+        HPX_NON_COPYABLE(parcelhandler)
     private:
         void parcel_sink(parcel const& p);
 
@@ -69,9 +76,6 @@ namespace hpx { namespace parcelset
         typedef std::map<
             handler_key_type, boost::shared_ptr<policies::message_handler> >
         message_handler_map;
-
-        typedef parcelport::read_handler_type read_handler_type;
-        typedef parcelport::write_handler_type write_handler_type;
 
         /// Construct a new \a parcelhandler initializing it from a AGAS client
         /// instance (parameter \a resolver) and the parcelport to be used for
@@ -204,10 +208,7 @@ namespace hpx { namespace parcelset
 
         /// \brief Factory function used in serialization to create a given
         /// locality endpoint
-        locality create_locality(std::string const & name) const
-        {
-            return find_parcelport(name)->create_locality();
-        }
+        locality create_locality(std::string const & name) const;
 
         /// Return the name of this locality as retrieved from the active
         /// parcelport
@@ -310,7 +311,7 @@ namespace hpx { namespace parcelset
         boost::int64_t get_buffer_allocate_time_received(std::string const&, bool) const;
 
         boost::int64_t get_connection_cache_statistics(std::string const& pp_type,
-            parcelport::connection_cache_statistics_type stat_type, bool) const;
+            connection_cache_statistics_type stat_type, bool) const;
 
         void list_parcelports(std::ostringstream& strm) const;
         void list_parcelport(std::ostringstream& strm,

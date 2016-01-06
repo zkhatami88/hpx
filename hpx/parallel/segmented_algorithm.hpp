@@ -6,7 +6,6 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_OCT_15_2014_0839PM)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_OCT_15_2014_0839PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/parallel/algorithm.hpp>
 
 #include <hpx/parallel/segmented_algorithms/count.hpp>

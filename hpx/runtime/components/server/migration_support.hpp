@@ -6,8 +6,11 @@
 #if !defined(HPX_COMPONENTS_SERVER_MIGRATION_SUPPORT_FEB_03_2014_0230PM)
 #define HPX_COMPONENTS_SERVER_MIGRATION_SUPPORT_FEB_03_2014_0230PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/get_lva.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/thread/locks.hpp>
 
@@ -71,7 +74,7 @@ namespace hpx { namespace components
         /// action.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type lva, F && f)
+        decorate_action(naming::address_type lva, F && f)
         {
             using util::placeholders::_1;
             return util::bind(

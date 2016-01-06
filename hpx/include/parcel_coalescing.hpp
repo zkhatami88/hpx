@@ -6,7 +6,6 @@
 #if !defined(HPX_PARCEL_COALESCING_FEB_27_2013_0654PM)
 #define HPX_PARCEL_COALESCING_FEB_27_2013_0654PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
 #endif

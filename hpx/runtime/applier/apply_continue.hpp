@@ -7,9 +7,11 @@
 #if !defined(HPX_RUNTIME_APPLIER_APPLY_CONTINUE_JAN_27_2013_0726PM)
 #define HPX_RUNTIME_APPLIER_APPLY_CONTINUE_JAN_27_2013_0726PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 
 #include <boost/make_shared.hpp>

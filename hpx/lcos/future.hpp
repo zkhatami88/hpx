@@ -33,8 +33,6 @@
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_void.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/utility/declval.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <type_traits>
@@ -243,7 +241,7 @@ namespace hpx { namespace lcos { namespace detail
 
             ~continuation_not_callable()
             {
-                error(boost::declval<Future>(), boost::declval<F&>());
+                error(std::declval<Future>(), std::declval<F&>());
             }
         } type;
     };
@@ -1127,7 +1125,7 @@ namespace hpx { namespace lcos
     // existing conversion path U --> T.
     template <typename T, typename U,
     HPX_CONCEPT_REQUIRES_(
-        boost::is_convertible<U, T>::value)>
+        std::is_convertible<U, T>::value)>
     hpx::future<T> make_future(hpx::future<U> && f)
     {
         return f.then(

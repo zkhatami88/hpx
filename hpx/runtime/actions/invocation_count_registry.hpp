@@ -7,7 +7,9 @@
 #define HPX_ACTIONS_INVOCATION_COUNT_REGISTRY_SEP_25_2015_0727AM
 
 #include <hpx/config.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
+#include <hpx/performance_counters/counter_path_elements.hpp>
 
 #include <hpx/util/jenkins_hash.hpp>
 #include <hpx/util/static.hpp>
@@ -21,7 +23,7 @@
 
 namespace hpx { namespace actions { namespace detail
 {
-    class HPX_EXPORT invocation_count_registry : boost::noncopyable
+    class invocation_count_registry : boost::noncopyable
     {
     public:
         typedef boost::int64_t (*get_invocation_count_type)(bool);
@@ -86,6 +88,10 @@ namespace hpx { namespace actions { namespace detail
     {                                                                         \
         template register_action_invocation_count<Action>                     \
             register_action_invocation_count<Action>::instance;               \
+        template void register_remote_action_invocation_count<Action>(        \
+            invocation_count_registry&);                                      \
+        template void register_local_action_invocation_count<Action>(         \
+            invocation_count_registry&);                                      \
     }}}                                                                       \
 /**/
 

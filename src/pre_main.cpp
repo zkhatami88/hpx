@@ -9,6 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>

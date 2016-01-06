@@ -6,8 +6,8 @@
 #if !defined(HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM)
 #define HPX_IOSTREAMS_SERVER_BUFFER_JUL_18_2014_0715PM
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/config.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>

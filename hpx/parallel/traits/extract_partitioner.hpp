@@ -6,8 +6,6 @@
 #if !defined(HPX_PARALLEL_TRAITS_EXTRACT_PARTITIONER_OCT_03_2014_0105PM)
 #define HPX_PARALLEL_TRAITS_EXTRACT_PARTITIONER_OCT_03_2014_0105PM
 
-#include <hpx/hpx_fwd.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits
 {

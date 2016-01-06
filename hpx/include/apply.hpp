@@ -10,5 +10,7 @@
 #include <hpx/runtime/applier/detail/apply_colocated.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_callback.hpp>
 
+#include <hpx/include/runtime_utils.hpp>
+
 #endif
 

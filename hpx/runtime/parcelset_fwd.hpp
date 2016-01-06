@@ -11,6 +11,7 @@
 
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/util/function.hpp>
 
 namespace hpx {
@@ -39,6 +40,27 @@ namespace hpx {
         typedef util::function_nonser<
             void(boost::system::error_code const&, parcel const&)
         > write_handler_type;
+
+        typedef util::function_nonser<
+            void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
+                 threads::thread_priority)
+        > read_handler_type;
+
+        /// Return the given connection cache statistic
+        enum connection_cache_statistics_type
+        {
+            connection_cache_insertions = 0,
+            connection_cache_evictions = 1,
+            connection_cache_hits = 2,
+            connection_cache_misses = 3,
+            connection_cache_reclaims = 4
+        };
+
+        class locality;
+
+        typedef std::map<std::string, locality> endpoints_type;
+
+        std::ostream& operator<< (std::ostream& os, endpoints_type const& endpoints);
     }
 }
 

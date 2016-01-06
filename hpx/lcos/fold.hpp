@@ -165,11 +165,12 @@ namespace hpx { namespace lcos
 #if !defined(HPX_LCOS_FOLD_SEP_29_2013_1442AM)
 #define HPX_LCOS_FOLD_SEP_29_2013_1442AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/lcos/detail/async_colocated.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/assert.hpp>

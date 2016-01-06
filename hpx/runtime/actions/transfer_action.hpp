@@ -12,9 +12,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/get_locality_id.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/base_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/invocation_count_registry.hpp>
+#include <hpx/runtime/actions/detail/action_serialization_data.hpp>
+#include <hpx/runtime/actions/detail/get_action_name.hpp>
+#include <hpx/runtime/actions/detail/thread_priority.hpp>
+#include <hpx/runtime/actions/detail/thread_stacksize.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/serialization/output_archive.hpp>
@@ -159,14 +163,14 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            naming::address::address_type lva)
+            naming::address_type lva)
         {
             return derived_type::construct_thread_function(lva,
                 util::get<Is>(std::move(arguments_))...);
         }
 
         threads::thread_function_type
-        get_thread_function(naming::address::address_type lva)
+        get_thread_function(naming::address_type lva)
         {
             return get_thread_function(
                 typename util::detail::make_index_pack<Action::arity>::type(),
@@ -191,7 +195,7 @@ namespace hpx { namespace actions
         template <std::size_t ...Is>
         threads::thread_function_type
         get_thread_function(util::detail::pack_c<std::size_t, Is...>,
-            std::unique_ptr<continuation> cont, naming::address::address_type lva)
+            std::unique_ptr<continuation> cont, naming::address_type lva)
         {
             return derived_type::construct_thread_function(std::move(cont), lva,
                 util::get<Is>(std::move(arguments_))...);
@@ -199,7 +203,7 @@ namespace hpx { namespace actions
 
         threads::thread_function_type
         get_thread_function(std::unique_ptr<continuation> cont,
-            naming::address::address_type lva)
+            naming::address_type lva)
         {
             return get_thread_function(
                 typename util::detail::make_index_pack<Action::arity>::type(),
@@ -265,7 +269,7 @@ namespace hpx { namespace actions
         /// Return all data needed for thread initialization
         threads::thread_init_data&
         get_thread_init_data(naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_init_data& data)
+            naming::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(lva);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
@@ -289,7 +293,7 @@ namespace hpx { namespace actions
         threads::thread_init_data&
         get_thread_init_data(std::unique_ptr<continuation> cont,
             naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_init_data& data)
+            naming::address_type lva, threads::thread_init_data& data)
         {
             data.func = get_thread_function(std::move(cont), lva);
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
@@ -312,7 +316,7 @@ namespace hpx { namespace actions
 
         // schedule a new thread
         void schedule_thread(naming::id_type const& target,
-            naming::address::address_type lva,
+            naming::address_type lva,
             threads::thread_state_enum initial_state,
             std::size_t num_thread)
         {
@@ -336,7 +340,7 @@ namespace hpx { namespace actions
         }
 
         void schedule_thread(std::unique_ptr<continuation> cont,
-            naming::id_type const& target, naming::address::address_type lva,
+            naming::id_type const& target, naming::address_type lva,
             threads::thread_state_enum initial_state,
             std::size_t num_thread)
         {
@@ -374,7 +378,7 @@ namespace hpx { namespace actions
 #if defined(HPX_HAVE_SECURITY)
         /// Return the set of capabilities required to invoke this action
         components::security::capability get_required_capabilities(
-            naming::address::address_type lva) const
+            naming::address_type lva) const
         {
             return traits::action_capability_provider<derived_type>::call(lva);
         }

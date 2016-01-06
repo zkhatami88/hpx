@@ -6,8 +6,9 @@
 #if !defined(HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM)
 #define HPX_THREADMANAGER_POLICIES_CALLBACK_NOTIFIER_JUN_18_2009_1132AM
 
-#include <hpx/hpx_fwd.hpp>
-#include <boost/exception_ptr.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/util/function.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

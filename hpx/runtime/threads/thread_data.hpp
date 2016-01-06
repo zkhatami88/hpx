@@ -9,7 +9,6 @@
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -278,7 +277,7 @@ namespace hpx { namespace threads
         }
 
         /// Return the id of the component this thread is running in
-        naming::address::address_type get_component_id() const
+        naming::address_type get_component_id() const
         {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
             return 0;
@@ -695,7 +694,7 @@ namespace hpx { namespace threads
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
 #ifdef HPX_HAVE_THREAD_TARGET_ADDRESS
-        naming::address::address_type component_id_;
+        naming::address_type component_id_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION

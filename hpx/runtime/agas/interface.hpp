@@ -11,11 +11,14 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/runtime/agas/namespace_action_code.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/agas/response.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
-#include <boost/dynamic_bitset.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace agas
 {

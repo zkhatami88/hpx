@@ -7,7 +7,6 @@
 #if !defined(HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM)
 #define HPX_EXAMPLES_SERVER_TEMPLATE_FUNCTION_ACCUMULATOR_JUL_12_2012_1056AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/local_lcos.hpp>
 

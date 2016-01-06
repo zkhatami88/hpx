@@ -8,11 +8,13 @@
 #if !defined(HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM)
 #define HPX_LCOS_ASYNC_CONTINUE_JAN_25_2013_0824AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>

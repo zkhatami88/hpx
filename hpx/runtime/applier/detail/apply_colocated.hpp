@@ -6,9 +6,9 @@
 #if !defined(HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM)
 #define HPX_RUNTIME_APPLIER_APPLY_COLOCATED_FEB_04_2014_0755PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/applier/detail/apply_colocated_fwd.hpp>

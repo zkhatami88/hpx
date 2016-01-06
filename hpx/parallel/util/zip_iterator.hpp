@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/zip_iterator.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>

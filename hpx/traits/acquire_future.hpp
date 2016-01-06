@@ -13,11 +13,13 @@
 #include <hpx/util/move.hpp>
 
 #include <boost/mpl/bool.hpp>
-#include <boost/range/functions.hpp>
-#include <boost/range/iterator_range.hpp>
+#include <boost/range/size.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <algorithm>
 #include <vector>
 #include <iterator>
 

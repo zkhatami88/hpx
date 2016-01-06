@@ -6,7 +6,6 @@
 #if !defined(HPX_BIND_APR_13_2012_0137PM)
 #define HPX_BIND_APR_13_2012_0137PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 

@@ -36,8 +36,9 @@ void test_small_stacksize()
     // do something to that array
     std::memset(array, '\0', sizeof(array));
 }
-HPX_PLAIN_ACTION(test_small_stacksize, test_small_stacksize_action)
+HPX_DEFINE_PLAIN_ACTION(test_small_stacksize, test_small_stacksize_action);
 HPX_ACTION_USES_SMALL_STACK(test_small_stacksize_action)
+HPX_REGISTER_ACTION(test_small_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_medium_stacksize()
@@ -54,8 +55,9 @@ void test_medium_stacksize()
     // do something to that array
     std::memset(array, '\0', sizeof(array));
 }
-HPX_PLAIN_ACTION(test_medium_stacksize, test_medium_stacksize_action)
+HPX_DEFINE_PLAIN_ACTION(test_medium_stacksize, test_medium_stacksize_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_medium_stacksize_action)
+HPX_REGISTER_ACTION(test_medium_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_large_stacksize()
@@ -72,8 +74,9 @@ void test_large_stacksize()
     // do something to that array
     std::memset(array, '\0', sizeof(array));
 }
-HPX_PLAIN_ACTION(test_large_stacksize, test_large_stacksize_action)
+HPX_DEFINE_PLAIN_ACTION(test_large_stacksize, test_large_stacksize_action);
 HPX_ACTION_USES_LARGE_STACK(test_large_stacksize_action)
+HPX_REGISTER_ACTION(test_large_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_huge_stacksize()
@@ -90,8 +93,9 @@ void test_huge_stacksize()
     // do something to that array
     std::memset(array, '\0', sizeof(array));
 }
-HPX_PLAIN_ACTION(test_huge_stacksize, test_huge_stacksize_action)
+HPX_DEFINE_PLAIN_ACTION(test_huge_stacksize, test_huge_stacksize_action);
 HPX_ACTION_USES_HUGE_STACK(test_huge_stacksize_action)
+HPX_REGISTER_ACTION(test_huge_stacksize_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

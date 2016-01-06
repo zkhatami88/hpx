@@ -7,7 +7,7 @@
 #if !defined(HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM)
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -43,7 +43,7 @@ namespace hpx { namespace applier { namespace detail
     {
         template <typename ...Ts>
         static void
-        call (naming::id_type const& target, naming::address::address_type lva,
+        call (naming::id_type const& target, naming::address_type lva,
             threads::thread_priority priority, Ts&&... vs)
         {
             std::unique_ptr<actions::continuation> cont;
@@ -78,7 +78,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename Continuation, typename ...Ts>
         static void
         call (Continuation && cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
+            naming::address_type lva, threads::thread_priority priority,
             Ts&&... vs)
         {
             std::unique_ptr<actions::continuation> c(
@@ -90,7 +90,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename ...Ts>
         static void
         call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
+            naming::address_type lva, threads::thread_priority priority,
             Ts&&... vs)
         {
             // first decorate the continuation
@@ -123,7 +123,7 @@ namespace hpx { namespace applier { namespace detail
         // If local and to be directly executed, just call the function
         template <typename ...Ts>
         static void
-        call (naming::id_type const& target, naming::address::address_type lva,
+        call (naming::id_type const& target, naming::address_type lva,
             threads::thread_priority, Ts&&... vs)
         {
             Action::execute_function(lva, std::forward<Ts>(vs)...);
@@ -132,7 +132,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename Continuation, typename ...Ts>
         static void
         call (Continuation && c, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority priority,
+            naming::address_type lva, threads::thread_priority priority,
             Ts&&... vs)
         {
             std::unique_ptr<actions::continuation> cont(
@@ -144,7 +144,7 @@ namespace hpx { namespace applier { namespace detail
         template <typename ...Ts>
         static void
         call (std::unique_ptr<actions::continuation> cont, naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_priority,
+            naming::address_type lva, threads::thread_priority,
             Ts&&... vs)
         {
             try {

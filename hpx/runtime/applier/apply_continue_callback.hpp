@@ -9,7 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 

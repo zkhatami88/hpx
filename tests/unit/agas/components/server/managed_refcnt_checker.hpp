@@ -8,11 +8,10 @@
 #if !defined(HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D)
 #define HPX_2F9C9286_A4A2_451C_BBD6_CD884F57B21D
 
-#include <vector>
-
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+
+#include <vector>
 
 namespace hpx { namespace test { namespace server
 {

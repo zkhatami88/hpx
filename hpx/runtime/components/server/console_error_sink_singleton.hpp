@@ -12,7 +12,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/signals2.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/signals2/signal.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <string>

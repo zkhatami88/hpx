@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/format.hpp>

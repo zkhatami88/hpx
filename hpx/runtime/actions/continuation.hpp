@@ -7,28 +7,22 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/actions/basic_action_fwd.hpp>
-#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
+#include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/actions/continuation_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
+#include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
+#include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/traits/is_continuation.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/invoke.hpp>
 #include <hpx/util/demangle_helper.hpp>
+#include <hpx/util/invoke.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unique_function.hpp>
-#include <hpx/traits/is_action.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_continuation.hpp>
-#include <hpx/traits/is_executor.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/preprocessor/stringize.hpp>

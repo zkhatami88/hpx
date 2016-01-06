@@ -19,6 +19,8 @@
 #include <boost/type_traits/add_const.hpp>
 #include <boost/cstdint.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace serialization
 {
     namespace detail
@@ -54,7 +56,6 @@ namespace hpx { namespace serialization
 
     template <typename T>
     input_archive & operator&(input_archive & ar, T & t);
-
 }}
 
 #define HPX_SERIALIZATION_SPLIT_MEMBER()                                            \

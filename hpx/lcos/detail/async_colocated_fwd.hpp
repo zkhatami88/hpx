@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/traits/is_continuation.hpp>
 #include <hpx/traits/promise_local_result.hpp>

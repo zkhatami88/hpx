@@ -6,9 +6,8 @@
 #if !defined(HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM)
 #define HPX_TRAITS_ACTION_SCHEDULE_THREAD_MAR_30_2014_0325PM
 
-#include <hpx/runtime/naming/address.hpp>
-#include <hpx/runtime/threads/thread_enums.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/threads/thread_data_fwd.hpp>
 
 namespace hpx { namespace traits
 {
@@ -18,7 +17,7 @@ namespace hpx { namespace traits
     struct action_schedule_thread
     {
         static void
-        call(naming::address::address_type lva, threads::thread_init_data& data,
+        call(naming::address_type lva, threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
             // by default we forward this to the component type

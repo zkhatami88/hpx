@@ -6,11 +6,13 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M)
 #define HPX_PERFORMANCE_COUNTERS_SERVER_BASE_MAR_03_2009_0741M
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/component.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
 
 #include <boost/detail/atomic_count.hpp>
@@ -148,14 +150,14 @@ namespace hpx { namespace performance_counters { namespace server
         /// does no hooking at all.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
+        decorate_action(naming::address_type, F && f)
         {
             return std::forward<F>(f);
         }
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
+        static void schedule_thread(naming::address_type,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {

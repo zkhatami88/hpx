@@ -19,7 +19,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/lcos/local/condition_variable.hpp>
@@ -27,6 +27,7 @@
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/functional/new.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
@@ -319,14 +320,14 @@ namespace hpx { namespace components { namespace server
         /// does no hooking at all.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
+        decorate_action(naming::address_type, F && f)
         {
             return std::forward<F>(f);
         }
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
+        static void schedule_thread(naming::address_type,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
@@ -951,7 +952,7 @@ namespace hpx { namespace traits
     {
         // return the required capabilities to invoke the given action
         static components::security::capability call(
-            naming::address::address_type lva)
+            naming::address_type lva)
         {
             components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);
@@ -968,7 +969,7 @@ namespace hpx { namespace traits
         components::server::create_component_direct_action<Component, Ts...> >
     {
         static components::security::capability call(
-            naming::address::address_type lva)
+            naming::address_type lva)
         {
             components::server::runtime_support* rts =
                 get_lva<components::server::runtime_support>::call(lva);

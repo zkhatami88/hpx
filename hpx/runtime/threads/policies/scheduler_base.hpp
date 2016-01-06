@@ -13,6 +13,7 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/util/coroutine/detail/tss.hpp>

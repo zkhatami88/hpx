@@ -9,6 +9,8 @@
 #define HPX_THREAD_HELPERS_NOV_15_2008_0504PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/policies/scheduler_mode.hpp>
@@ -16,9 +18,7 @@
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/function.hpp>
-#include <hpx/exception.hpp>
 
-#include <boost/exception_ptr.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
@@ -434,117 +434,7 @@ namespace hpx { namespace threads
     HPX_API_EXPORT void set_scheduler_mode(threads::policies::scheduler_mode);
 }}
 
-namespace hpx { namespace this_thread
-{
-    ///////////////////////////////////////////////////////////////////////////
-    /// The function \a suspend will return control to the thread manager
-    /// (suspends the current thread). It sets the new state of this thread
-    /// to the thread state passed as the parameter.
-    ///
-    /// \note Must be called from within a HPX-thread.
-    ///
-    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
-    ///         to an appropriate value when an error occurs. Otherwise, this
-    ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the thread-manager is not
-    ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
-    ///
-    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
-        threads::thread_state_enum state = threads::pending,
-        char const* description = "this_thread::suspend",
-        error_code& ec = throws);
-
-    /// The function \a suspend will return control to the thread manager
-    /// (suspends the current thread). It sets the new state of this thread
-    /// to \a suspended and schedules a wakeup for this threads at the given
-    /// time.
-    ///
-    /// \note Must be called from within a HPX-thread.
-    ///
-    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
-    ///         to an appropriate value when an error occurs. Otherwise, this
-    ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the thread-manager is not
-    ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
-    ///
-    HPX_API_EXPORT threads::thread_state_ex_enum suspend(
-        util::steady_time_point const& abs_time,
-        char const* description = "this_thread::suspend",
-        error_code& ec = throws);
-
-    /// The function \a suspend will return control to the thread manager
-    /// (suspends the current thread). It sets the new state of this thread
-    /// to \a suspended and schedules a wakeup for this threads after the given
-    /// duration.
-    ///
-    /// \note Must be called from within a HPX-thread.
-    ///
-    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
-    ///         to an appropriate value when an error occurs. Otherwise, this
-    ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the thread-manager is not
-    ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
-    ///
-    inline threads::thread_state_ex_enum suspend(
-        util::steady_duration const& rel_time,
-        char const* description = "this_thread::suspend",
-        error_code& ec = throws)
-    {
-        return suspend(rel_time.from_now(), description, ec);
-    }
-
-    /// The function \a suspend will return control to the thread manager
-    /// (suspends the current thread). It sets the new state of this thread
-    /// to \a suspended and schedules a wakeup for this threads after the given
-    /// time (specified in milliseconds).
-    ///
-    /// \note Must be called from within a HPX-thread.
-    ///
-    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
-    ///         to an appropriate value when an error occurs. Otherwise, this
-    ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the thread-manager is not
-    ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
-    ///
-    inline threads::thread_state_ex_enum suspend(
-        boost::uint64_t ms, char const* description = "this_thread::suspend",
-        error_code& ec = throws)
-    {
-        return suspend(boost::chrono::milliseconds(ms), description, ec);
-    }
-
-    /// Returns a reference to the executor which was used to create the current
-    /// thread.
-    ///
-    /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
-    ///         to an appropriate value when an error occurs. Otherwise, this
-    ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
-    ///         If this function is called while the thread-manager is not
-    ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
-    ///
-    HPX_EXPORT threads::executors::current_executor
-        get_executor(error_code& ec = throws);
-}}
+#include <hpx/runtime/threads/this_thread.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIXME: the API function below belong into the namespace hpx::threads

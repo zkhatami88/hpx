@@ -11,9 +11,14 @@
 #if !defined(HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F)
 #define HPX_F26CC3F9_3E30_4C54_90E0_0CD02146320F
 
-#include <hpx/exception.hpp>
-#include <hpx/performance_counters/counters.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/performance_counters/counters_fwd.hpp>
+#include <hpx/performance_counters/counter_info.hpp>
+#include <hpx/performance_counters/counter_status.hpp>
+#include <hpx/performance_counters/counter_type.hpp>
 #include <hpx/util/function.hpp>
+
+#include <string>
 
 namespace hpx { namespace performance_counters
 {
@@ -29,41 +34,14 @@ namespace hpx { namespace performance_counters
             uninstall();
         }
 
-        counter_status install(error_code& ec = throws)
-        {
-            if (status_invalid_data != status_) {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
-                    "manage_counter_type::install",
-                    "counter type " + info_.fullname_ +
-                    " has been already installed.");
-                return status_invalid_data;
-            }
-
-            return status_ = add_counter_type(info_, ec);
-        }
+        counter_status install(error_code& ec = throws);
 
         counter_status install(
             create_counter_func const& create_counter,
             discover_counters_func const& discover_counters,
-            error_code& ec = throws)
-        {
-            if (status_invalid_data != status_) {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
-                    "manage_counter_type::install",
-                    "generic counter type " + info_.fullname_ +
-                    " has been already installed.");
-                return status_invalid_data;
-            }
+            error_code& ec = throws);
 
-            return status_ = add_counter_type(
-                info_, create_counter, discover_counters, ec);
-        }
-
-        void uninstall(error_code& ec = throws)
-        {
-            if (status_invalid_data != status_)
-                remove_counter_type(info_, ec); // ignore errors
-        }
+        void uninstall(error_code& ec = throws);
 
     private:
         counter_status status_;

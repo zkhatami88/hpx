@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -202,7 +202,7 @@ namespace hpx { namespace applier
 
     void register_work_plain(
         threads::thread_function_type && func,
-        char const* desc, naming::address::address_type lva,
+        char const* desc, naming::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -225,7 +225,7 @@ namespace hpx { namespace applier
     void register_work_plain(
         threads::thread_function_type && func,
         naming::id_type const& target,
-        char const* desc, naming::address::address_type lva,
+        char const* desc, naming::address_type lva,
         threads::thread_state_enum state, threads::thread_priority priority,
         std::size_t os_thread, threads::thread_stacksize stacksize,
         error_code& ec)
@@ -452,7 +452,7 @@ namespace hpx { namespace applier
             HPX_ASSERT(dest == addr.locality_);
 
             // decode the local virtual address of the parcel
-            naming::address::address_type lva = addr.address_;
+            naming::address_type lva = addr.address_;
 
             // by convention, a zero address references the local runtime
             // support component

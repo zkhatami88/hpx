@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/lcos_fwd.hpp>
-#include <hpx/runtime/naming/name.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>

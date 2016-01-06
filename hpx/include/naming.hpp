@@ -7,11 +7,12 @@
 #if !defined(HPX_NAMING_MAR_24_2008_0930AM)
 #define HPX_NAMING_MAR_24_2008_0930AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/naming/unmanaged.hpp>
+
+#include <hpx/include/runtime_utils.hpp>
 
 #endif
 

@@ -965,7 +965,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_add_compile_flag_if_available(-Wno-sign-promo LANGUAGES CXX)
-    hpx_add_compile_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_add_compile_flag_if_available(-Wno-cast-align LANGUAGES CXX)
 
     # These are usually benign and can't be suppressed because of

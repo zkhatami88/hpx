@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_MINMAX_AUG_20_2014_1005AM)
 #define HPX_PARALLEL_DETAIL_MINMAX_AUG_20_2014_1005AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/assert.hpp>
 

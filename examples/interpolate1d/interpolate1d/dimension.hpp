@@ -6,8 +6,6 @@
 #if !defined(HPX_DIMENSION_AUG_04_2011_0719PM)
 #define HPX_DIMENSION_AUG_04_2011_0719PM
 
-#include <hpx/hpx_fwd.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace interpolate1d
 {

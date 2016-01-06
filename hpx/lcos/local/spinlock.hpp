@@ -17,7 +17,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/this_thread.hpp>
 
 #include <boost/thread/locks.hpp>
 

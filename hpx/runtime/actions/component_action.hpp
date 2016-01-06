@@ -10,10 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
-#include <hpx/runtime/components/console_error_sink.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -44,7 +43,7 @@ namespace hpx { namespace actions
       : public basic_action<Component, R(Ps...), Derived>
     {
     public:
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             std::stringstream name;
             name << "component action("
@@ -62,7 +61,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva, Ts&&... vs)
+        static R invoke(naming::address_type lva, Ts&&... vs)
         {
             basic_action<Component, R(Ps...), Derived>::
                 increment_invocation_count();
@@ -83,7 +82,7 @@ namespace hpx { namespace actions
       : public basic_action<Component const, R(Ps...), Derived>
     {
     public:
-        static std::string get_action_name(naming::address::address_type lva)
+        static std::string get_action_name(naming::address_type lva)
         {
             std::stringstream name;
             name << "component action("
@@ -101,7 +100,7 @@ namespace hpx { namespace actions
         }
 
         template <typename ...Ts>
-        static R invoke(naming::address::address_type lva, Ts&&... vs)
+        static R invoke(naming::address_type lva, Ts&&... vs)
         {
             basic_action<Component const, R(Ps...), Derived>::
                 increment_invocation_count();

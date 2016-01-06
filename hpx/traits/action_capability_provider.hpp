@@ -21,7 +21,7 @@ namespace hpx { namespace traits
     {
         // return the required capabilities to invoke the given action
         static components::security::capability call(
-            naming::address::address_type /*lva*/)
+            naming::address_type /*lva*/)
         {
             // by default actions don't require any capabilities to
             // be invoked

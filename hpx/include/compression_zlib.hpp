@@ -6,7 +6,6 @@
 #if !defined(HPX_COMPRESSION_ZLIB_FEB_26_2013_0415AM)
 #define HPX_COMPRESSION_ZLIB_FEB_26_2013_0415AM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/plugins/binary_filter/zlib_serialization_filter.hpp>
 
 #endif

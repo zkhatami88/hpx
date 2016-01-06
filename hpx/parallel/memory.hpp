@@ -6,8 +6,6 @@
 #if !defined(HPX_PARALLEL_MEMORY_OCT_05_2014_0414PM)
 #define HPX_PARALLEL_MEMORY_OCT_05_2014_0414PM
 
-#include <hpx/hpx_fwd.hpp>
-
 /// See N4071: 1.3/3
 #include <memory>
 

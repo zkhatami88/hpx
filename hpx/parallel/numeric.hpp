@@ -7,8 +7,6 @@
 #if !defined(HPX_PARALLEL_NUMERIC_JUN_02_2014_1151AM)
 #define HPX_PARALLEL_NUMERIC_JUN_02_2014_1151AM
 
-#include <hpx/hpx_fwd.hpp>
-
 /// See N4310: 1.3/3
 #include <numeric>
 

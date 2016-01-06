@@ -4,19 +4,20 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/ini.hpp>
-#include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
+#include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/util/serialize_exception.hpp>
 
-#include <boost/lexical_cast.hpp>
-
-#include <vector>
-#include <iostream>
+///////////////////////////////////////////////////////////////////////////////
+// This must be in global namespace
+HPX_REGISTER_ACTION_ID(
+    hpx::components::server::console_error_sink_action,
+    console_error_sink_action,
+    hpx::actions::console_error_sink_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -29,11 +30,4 @@ namespace hpx { namespace components { namespace server
         get_error_dispatcher()(hpx::diagnostic_information(e));
     }
 }}}
-
-///////////////////////////////////////////////////////////////////////////////
-// This must be in global namespace
-HPX_REGISTER_ACTION_ID(
-    hpx::components::server::console_error_sink_action,
-    console_error_sink_action,
-    hpx::actions::console_error_sink_action_id)
 

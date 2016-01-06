@@ -10,6 +10,7 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
+#include <hpx/runtime/serialization/detail/size_gatherer_container.hpp>
 #include <hpx/runtime/parcelset/parcel.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/util/high_resolution_timer.hpp>

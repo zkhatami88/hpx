@@ -8,7 +8,7 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_INTRUSIVE_FACTORY_HPP
 
-#include <hpx/exception.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 
 #include <hpx/util/jenkins_hash.hpp>
@@ -20,6 +20,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
+
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,24 +36,7 @@ namespace hpx { namespace serialization { namespace detail
 
         HPX_EXPORT static polymorphic_intrusive_factory& instance();
 
-        void register_class(const std::string& name, ctor_type fun)
-        {
-            if(name.empty())
-            {
-                HPX_THROW_EXCEPTION(serialization_error
-                  , "polymorphic_intrusive_factory::register_class"
-                  , "Cannot register a factory with an empty name");
-            }
-            auto it = map_.find(name);
-            if(it == map_.end())
-            {
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-                map_.emplace(name, fun);
-#else
-                map_.insert(ctor_map_type::value_type(name, fun));
-#endif
-            }
-        }
+        void register_class(const std::string& name, ctor_type fun);
 
         template <class T>
         T* create(const std::string& name) const

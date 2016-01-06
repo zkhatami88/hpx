@@ -8,8 +8,9 @@
 #define HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/naming/name.hpp>
-#include <hpx/runtime/naming/address.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/threads_fwd.hpp>
 #include <hpx/util/move.hpp>
 
 namespace hpx { namespace threads
@@ -61,7 +62,7 @@ namespace hpx { namespace threads
 
         template <typename F>
         thread_init_data(F && f, char const* desc,
-                naming::address::address_type lva_ = 0,
+                naming::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
@@ -87,7 +88,7 @@ namespace hpx { namespace threads
         threads::thread_function_type func;
 
 #if defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-        naming::address::address_type lva;
+        naming::address_type lva;
 #endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* description;

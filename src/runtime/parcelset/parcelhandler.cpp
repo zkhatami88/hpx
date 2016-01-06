@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/config/asio.hpp>
@@ -14,6 +14,8 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
@@ -349,7 +351,7 @@ namespace hpx { namespace parcelset
 
     namespace detail
     {
-        void parcel_sent_handler(parcelhandler::write_handler_type & f,
+        void parcel_sent_handler(write_handler_type & f,
             boost::system::error_code const & ec, parcel const & p)
         {
             // inform termination detection of a sent message
@@ -574,6 +576,11 @@ namespace hpx { namespace parcelset
         return (*it).second.get();
     }
 
+    locality parcelhandler::create_locality(std::string const & name) const
+    {
+        return find_parcelport(name)->create_locality();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     std::string parcelhandler::get_locality_name() const
     {
@@ -750,7 +757,7 @@ namespace hpx { namespace parcelset
     // connection stack statistics
     boost::int64_t parcelhandler::get_connection_cache_statistics(
         std::string const& pp_type,
-        parcelport::connection_cache_statistics_type stat_type, bool reset) const
+        connection_cache_statistics_type stat_type, bool reset) const
     {
         error_code ec(lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);
@@ -1058,19 +1065,19 @@ namespace hpx { namespace parcelset
         // caches
         util::function_nonser<boost::int64_t(bool)> cache_insertions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_insertions, _1));
+                this, pp_type, parcelset::connection_cache_insertions, _1));
         util::function_nonser<boost::int64_t(bool)> cache_evictions(
             util::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_evictions, _1));
+                this, pp_type, parcelset::connection_cache_evictions, _1));
         util::function_nonser<boost::int64_t(bool)> cache_hits(
             util::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_hits, _1));
+                this, pp_type, parcelset::connection_cache_hits, _1));
         util::function_nonser<boost::int64_t(bool)> cache_misses(
             util::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_misses, _1));
+                this, pp_type, parcelset::connection_cache_misses, _1));
         util::function_nonser<boost::int64_t(bool)> cache_reclaims(
             util::bind(&parcelhandler::get_connection_cache_statistics,
-                this, pp_type, parcelport::connection_cache_reclaims, _1));
+                this, pp_type, parcelset::connection_cache_reclaims, _1));
 
         performance_counters::generic_counter_type_data const connection_cache_types[] =
         {

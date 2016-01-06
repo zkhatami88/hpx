@@ -63,15 +63,6 @@ namespace hpx { namespace parcelset
         friend struct agas::big_boot_barrier;
 
     public:
-        typedef util::function_nonser<
-            void(boost::system::error_code const&, parcel const&)
-        > write_handler_type;
-
-        typedef util::function_nonser<
-            void(parcelport& pp, boost::shared_ptr<std::vector<char> >,
-                 threads::thread_priority)
-        > read_handler_type;
-
         /// Construct the parcelport on the given locality.
         parcelport(util::runtime_configuration const& ini, locality const & here,
             std::string const& type);
@@ -159,16 +150,6 @@ namespace hpx { namespace parcelset
 
         /// Return the thread pool if the name matches
         virtual util::io_service_pool* get_thread_pool(char const* name) = 0;
-
-        /// Return the given connection cache statistic
-        enum connection_cache_statistics_type
-        {
-            connection_cache_insertions = 0,
-            connection_cache_evictions = 1,
-            connection_cache_hits = 2,
-            connection_cache_misses = 3,
-            connection_cache_reclaims = 4
-        };
 
         // invoke pending background work
         virtual bool do_background_work(std::size_t num_thread) = 0;

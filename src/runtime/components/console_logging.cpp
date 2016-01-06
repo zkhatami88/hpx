@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
@@ -15,6 +15,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/fusion/include/at_c.hpp>
@@ -83,7 +84,7 @@ namespace hpx { namespace components
         }
 
         try {
-            hpx::apply<server::console_logging_action<> >(prefix, msgs);
+            hpx::apply<server::console_logging_action>(prefix, msgs);
         }
         catch (hpx::exception const& e) {
             // if this is not the console locality (or any other error occurs)

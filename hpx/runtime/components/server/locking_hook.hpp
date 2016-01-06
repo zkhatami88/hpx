@@ -6,8 +6,9 @@
 #if !defined(HPX_COMPONENTS_SERVER_LOCKING_HOOK_OCT_17_2012_0732PM)
 #define HPX_COMPONENTS_SERVER_LOCKING_HOOK_OCT_17_2012_0732PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/get_lva.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
@@ -40,7 +41,7 @@ namespace hpx { namespace components
         /// for this component instance.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type lva, F && f)
+        decorate_action(naming::address_type lva, F && f)
         {
             return util::bind(
                 util::one_shot(&locking_hook::thread_function),

@@ -6,6 +6,7 @@
 #if !defined(HPX_NAMING_ADDRESS_MAR_24_2008_0949AM)
 #define HPX_NAMING_ADDRESS_MAR_24_2008_0949AM
 
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
@@ -25,8 +26,8 @@ namespace hpx { namespace naming
 {
     struct HPX_EXPORT address
     {
+        typedef naming::address_type address_type;
         typedef boost::int32_t component_type;
-        typedef boost::uint64_t address_type;
 
         ///////////////////////////////////////////////////////////////////////
         address()

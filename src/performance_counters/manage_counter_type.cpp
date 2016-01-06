@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -18,6 +19,42 @@
 
 namespace hpx { namespace performance_counters
 {
+    counter_status manage_counter_type::install(error_code& ec)
+    {
+        if (status_invalid_data != status_) {
+            HPX_THROWS_IF(ec, hpx::invalid_status,
+                "manage_counter_type::install",
+                "counter type " + info_.fullname_ +
+                " has been already installed.");
+            return status_invalid_data;
+        }
+
+        return status_ = add_counter_type(info_, ec);
+    }
+
+    counter_status manage_counter_type::install(
+        create_counter_func const& create_counter,
+        discover_counters_func const& discover_counters,
+        error_code& ec)
+    {
+        if (status_invalid_data != status_) {
+            HPX_THROWS_IF(ec, hpx::invalid_status,
+                "manage_counter_type::install",
+                "generic counter type " + info_.fullname_ +
+                " has been already installed.");
+            return status_invalid_data;
+        }
+
+        return status_ = add_counter_type(
+            info_, create_counter, discover_counters, ec);
+    }
+
+    void manage_counter_type::uninstall(error_code& ec)
+    {
+        if (status_invalid_data != status_)
+            remove_counter_type(info_, ec); // ignore errors
+    }
+
     void counter_type_shutdown(boost::shared_ptr<manage_counter_type> const& p)
     {
         error_code ec(lightweight);

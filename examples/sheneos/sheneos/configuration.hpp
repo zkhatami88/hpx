@@ -6,7 +6,6 @@
 #if !defined(HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1221PM)
 #define HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1221PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/client.hpp>
 

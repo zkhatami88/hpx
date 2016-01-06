@@ -12,6 +12,7 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/scoped_array.hpp>

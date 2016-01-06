@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
-#include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/actions/basic_action.hpp>
 
 namespace hpx { namespace detail
 {

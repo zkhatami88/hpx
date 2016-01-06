@@ -7,10 +7,11 @@
 #if !defined(HPX_RUNTIME_RUNTIME_IMPL_HPP)
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/components/server/console_error_sink_singleton.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
@@ -29,6 +29,7 @@
 
 #include <boost/detail/atomic_count.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2/connection.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/exception_ptr.hpp>
@@ -376,7 +377,7 @@ namespace hpx
         util::io_service_pool timer_pool_;
         scheduling_policy_type scheduler_;
         notification_policy_type notifier_;
-        boost::scoped_ptr<hpx::threads::threadmanager_base> thread_manager_;
+        std::unique_ptr<hpx::threads::threadmanager_base> thread_manager_;
         parcelset::parcelhandler parcel_handler_;
         naming::resolver_client agas_client_;
         util::detail::init_logging init_logging_;

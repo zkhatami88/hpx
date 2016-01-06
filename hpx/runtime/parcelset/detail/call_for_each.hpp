@@ -7,7 +7,7 @@
 #ifndef HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 #define HPX_RUNTIME_PARCELSET_DETAIL_CALL_FOR_EACH_HPP
 
-#include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/util/move.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ namespace hpx { namespace parcelset
         public:
             typedef void result_type;
 
-            typedef std::vector<parcelport::write_handler_type> handlers_type;
+            typedef std::vector<write_handler_type> handlers_type;
             typedef std::vector<parcel> parcels_type;
             handlers_type handlers_;
             parcels_type parcels_;

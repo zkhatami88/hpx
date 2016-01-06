@@ -5,7 +5,6 @@
 
 // This must fail compiling
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <utility>

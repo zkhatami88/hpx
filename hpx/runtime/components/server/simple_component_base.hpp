@@ -10,7 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/is_component.hpp>
+#include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -214,14 +216,14 @@ namespace hpx { namespace components
         /// does no hooking at all.
         template <typename F>
         static threads::thread_function_type
-        decorate_action(naming::address::address_type, F && f)
+        decorate_action(naming::address_type, F && f)
         {
             return std::forward<F>(f);
         }
 
         /// This is the default hook implementation for schedule_thread which
         /// forwards to the default scheduler.
-        static void schedule_thread(naming::address::address_type,
+        static void schedule_thread(naming::address_type,
             threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {

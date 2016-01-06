@@ -17,6 +17,7 @@
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/applier/detail/apply_implementations.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/extract_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_priority.hpp>
@@ -120,7 +121,7 @@ namespace hpx
         inline bool
         put_parcel_cb(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority,
-            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+            parcelset::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::type
@@ -141,7 +142,7 @@ namespace hpx
         inline bool
         put_parcel_cb(naming::id_type const& id, naming::address&& addr,
             threads::thread_priority priority,
-            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+            parcelset::write_handler_type && cb, Ts&&... vs)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::type
@@ -163,7 +164,7 @@ namespace hpx
         put_parcel_cont_cb(naming::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation && cont,
-            parcelset::parcelhandler::write_handler_type const& cb, Ts&&... vs)
+            parcelset::write_handler_type const& cb, Ts&&... vs)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::type
@@ -186,7 +187,7 @@ namespace hpx
         put_parcel_cont_cb(naming::id_type const& id,
             naming::address&& addr, threads::thread_priority priority,
             Continuation && cont,
-            parcelset::parcelhandler::write_handler_type && cb, Ts&&... vs)
+            parcelset::write_handler_type && cb, Ts&&... vs)
         {
             typedef
                 typename hpx::actions::extract_action<Action>::type

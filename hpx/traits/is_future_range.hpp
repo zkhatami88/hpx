@@ -12,7 +12,6 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/range/iterator_range.hpp>
 
 #include <vector>
 
@@ -30,11 +29,6 @@ namespace hpx { namespace traits
       : is_future<typename util::decay<Range>::type::value_type>
     {};
 
-    template <typename Iterator>
-    struct is_future_range<boost::iterator_range<Iterator> >
-      : is_future<typename std::iterator_traits<Iterator>::value_type>
-    {};
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable>
     struct future_range_traits;
@@ -45,17 +39,6 @@ namespace hpx { namespace traits
         >
     {
         typedef typename Range::value_type future_type;
-    };
-
-    template <typename Iterator>
-    struct future_range_traits<
-            boost::iterator_range<Iterator>,
-            typename boost::enable_if<
-                is_future<typename std::iterator_traits<Iterator>::value_type>
-            >::type
-        >
-    {
-        typedef typename std::iterator_traits<Iterator>::value_type future_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////

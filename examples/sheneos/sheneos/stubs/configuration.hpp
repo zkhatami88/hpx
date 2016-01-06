@@ -6,7 +6,6 @@
 #if !defined(HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1217PM)
 #define HPX_SHENEOS_CONFIGURATION_AUG_08_2011_1217PM
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/components/stubs/stub_base.hpp>

@@ -4,7 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
@@ -15,6 +14,9 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
+#include <hpx/runtime/find_localities.hpp>
+#include <hpx/runtime/startup_function.hpp>
+#include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
@@ -31,6 +33,7 @@
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
 #include <hpx/lcos/wait_all.hpp>

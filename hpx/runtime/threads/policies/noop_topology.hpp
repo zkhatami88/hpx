@@ -124,7 +124,7 @@ public:
     }
 
     mask_type get_thread_affinity_mask_from_lva(
-        naming::address::address_type lva
+        naming::address_type lva
       , error_code& ec = throws
         ) const
     {

@@ -8,6 +8,7 @@
 #if !defined(HPX_BABB0428_2085_4DCF_851A_8819D186835E)
 #define HPX_BABB0428_2085_4DCF_851A_8819D186835E
 
+#include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <hpx/config/export_definitions.hpp>
@@ -30,6 +31,8 @@
 #endif
 
 #if !defined(HPX_NATIVE_TLS)
+// Include some header which might define the _GLIBCXX_HAVE_TLS macro
+#include <cstring>
 #  if defined(_GLIBCXX_HAVE_TLS)
 #    define HPX_NATIVE_TLS __thread
 #  elif defined(HPX_WINDOWS)

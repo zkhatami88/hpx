@@ -9,7 +9,7 @@
 #define HPX_UTIL_UNIQUE_FUNCTION_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/serialization/serialization_fwd.hpp>
+#include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/needs_automatic_registration.hpp>
 #include <hpx/util/detail/basic_function.hpp>
 #include <hpx/util/detail/unique_function_template.hpp>

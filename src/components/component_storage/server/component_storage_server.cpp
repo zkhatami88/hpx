@@ -4,6 +4,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/components/component_storage/server/component_storage.hpp>
+#include <hpx/runtime/find_localities.hpp>
 
 namespace hpx { namespace components { namespace server
 {

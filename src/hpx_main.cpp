@@ -9,6 +9,7 @@
 #include <hpx/util/ini.hpp>
 
 #include <boost/scoped_array.hpp>
+#include <boost/program_options/parsers.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_main, if necessary. This has to be in a separate

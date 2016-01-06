@@ -9,22 +9,17 @@
 #if !defined(HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB)
 #define HPX_D69CE952_C5D9_4545_B83E_BA3DCFD812EB
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
-#include <hpx/runtime/agas/namespace_action_code.hpp>
-#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
-#include <hpx/runtime/serialization/vector.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/logging.hpp>
 #include <hpx/util/function.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
 #include <map>
 
-#include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
 
