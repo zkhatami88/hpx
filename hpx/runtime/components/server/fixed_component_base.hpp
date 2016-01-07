@@ -8,7 +8,8 @@
 #define HPX_F5D19D10_9D74_4DB9_9ABB_ECCF2FA54497
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/exception/error_code.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/components_fwd.hpp>

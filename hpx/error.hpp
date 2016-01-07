@@ -12,6 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/config/export_definitions.hpp>
+
+#include <boost/system/error_code.hpp>
+
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,6 +221,25 @@ namespace hpx
         std::string const& func, std::string const& file = "", long line = -1);
     /// \endcond
 }
+
+/// \cond NOEXTERNAL
+namespace boost
+{
+    namespace system
+    {
+        // make sure our errors get recognized by the Boost.System library
+        template<> struct is_error_code_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
+
+        template<> struct is_error_condition_enum<hpx::error>
+        {
+            static const bool value = true;
+        };
+    }
+}
+/// \endcond
 
 #endif
 

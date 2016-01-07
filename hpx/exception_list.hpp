@@ -8,7 +8,7 @@
 #if !defined(HPX_EXCEPTION_LIST_OCT_06_2008_0942AM)
 #define HPX_EXCEPTION_LIST_OCT_06_2008_0942AM
 
-#include <hpx/exception_fwd.hpp>
+#include <hpx/exception/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unlock_guard.hpp>

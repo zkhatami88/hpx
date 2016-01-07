@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/traits/is_component.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/components/server/wrapper_heap.hpp>
@@ -17,6 +17,7 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/serialization/detail/raw_ptr.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
 #include <boost/noncopyable.hpp>

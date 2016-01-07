@@ -11,7 +11,6 @@
 #include <memory>
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
@@ -19,8 +18,9 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <boost/atomic.hpp>
+#include <boost/exception_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

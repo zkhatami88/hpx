@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception_fwd.hpp>
+#include <hpx/exception/diagnostic_information.hpp>
 #include <hpx/runtime/actions/basic_action.hpp>
 #include <hpx/runtime/actions/transfer_action.hpp>
 #include <hpx/runtime/components/server/console_error_sink.hpp>

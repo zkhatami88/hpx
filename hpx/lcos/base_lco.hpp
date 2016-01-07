@@ -7,7 +7,6 @@
 #define HPX_LCOS_BASE_LCO_JUN_12_2008_0852PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
@@ -15,6 +14,7 @@
 
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace lcos

@@ -23,7 +23,8 @@
 #include <boost/throw_exception.hpp>
 #include <utility>
 
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin/config.hpp>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)

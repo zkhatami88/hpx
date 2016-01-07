@@ -8,7 +8,7 @@
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <memory>

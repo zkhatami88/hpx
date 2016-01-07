@@ -8,6 +8,8 @@
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception/thread_interrupted.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_executor.hpp>
@@ -18,6 +20,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>

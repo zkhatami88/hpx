@@ -6,7 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/exception/detail/command_line_error.hpp>
 #include <hpx/apply.hpp>
 #include <hpx/config/defaults.hpp>
 #include <hpx/util/ini.hpp>

@@ -15,7 +15,7 @@
 
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/naming/address.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 
 #if defined(__ANDROID__) && defined(ANDROID)
 #include <cpu-features.h>

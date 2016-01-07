@@ -9,7 +9,8 @@
 #define HPX_PARALLEL_TASK_BLOCK_JUL_09_2014_1250PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/dataflow.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -28,6 +29,7 @@
 #include <memory>                           // std::addressof
 #include <boost/utility/addressof.hpp>      // boost::addressof
 
+#include <boost/exception_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
 namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v2)

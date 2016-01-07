@@ -7,7 +7,7 @@
 #define HPX_UTIL_QUERY_COUNTERS_SEP_27_2011_0255PM
 
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/util/interval_timer.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/performance_counters/counter_info.hpp>

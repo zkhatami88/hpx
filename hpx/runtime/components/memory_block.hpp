@@ -8,7 +8,6 @@
 #define HPX_COMPONENTS_MEMORY_BLOCK_OCT_22_2008_0416PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/components/stubs/memory_block.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/util/unwrapped.hpp>

@@ -17,7 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/threads/topology.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/static.hpp>

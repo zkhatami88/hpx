@@ -8,7 +8,6 @@
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/components/server/console_error_sink_singleton.hpp>

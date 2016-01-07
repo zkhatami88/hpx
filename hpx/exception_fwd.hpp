@@ -14,6 +14,7 @@
 /// \cond NOINTERNAL
 namespace boost
 {
+    class exception;
     class exception_ptr;
 }
 /// \endcond
@@ -22,8 +23,8 @@ namespace hpx
 {
     /// \cond NOINTERNAL
     // forward declaration
-    class error_code;
-    class exception;
+    class HPX_EXCEPTION_EXPORT error_code;
+    class HPX_EXCEPTION_EXPORT exception;
     /// \endcond
 
     /// \brief Predefined error_code object used as "throw on error" tag.

@@ -13,7 +13,7 @@
 #include <hpx/util/plugin/dll.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
 
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/type_traits/remove_pointer.hpp>

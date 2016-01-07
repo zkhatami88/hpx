@@ -5,7 +5,39 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/detail/access_exception.hpp>
+#include <hpx/exception/detail/backtrace.hpp>
+#include <hpx/exception/detail/construct_exception.hpp>
+#include <hpx/exception/detail/error_info.hpp>
+#include <hpx/exception/detail/get_execution_environment.hpp>
+#include <hpx/exception/detail/hpx_category.hpp>
+#include <hpx/exception/detail/report_exception.hpp>
+#include <hpx/exception/detail/std_exception.hpp>
+#include <hpx/exception/assertion_failed.hpp>
+#include <hpx/exception/diagnostic_information.hpp>
+#include <hpx/exception/error_code.hpp>
+#include <hpx/exception/exception.hpp>
+#include <hpx/exception/expect_exception.hpp>
+#include <hpx/exception/get_category.hpp>
+#include <hpx/exception/get_error_backtrace.hpp>
+#include <hpx/exception/get_error_config.hpp>
+#include <hpx/exception/get_error_env.hpp>
+#include <hpx/exception/get_error_file_name.hpp>
+#include <hpx/exception/get_error_function_name.hpp>
+#include <hpx/exception/get_error_host_name.hpp>
+#include <hpx/exception/get_error.hpp>
+#include <hpx/exception/get_error_line_number.hpp>
+#include <hpx/exception/get_error_locality_id.hpp>
+#include <hpx/exception/get_error_os_thread.hpp>
+#include <hpx/exception/get_error_process_id.hpp>
+#include <hpx/exception/get_error_state.hpp>
+#include <hpx/exception/get_error_thread_description.hpp>
+#include <hpx/exception/get_error_thread_id.hpp>
+#include <hpx/exception/get_error_what.hpp>
+#include <hpx/exception/get_exception.hpp>
+#include <hpx/exception/thread_interrupted.hpp>
+#include <hpx/exception/throwmode.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/state.hpp>
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
@@ -584,6 +616,18 @@ namespace hpx
     std::string diagnostic_information(hpx::error_code const& e)
     {
         return hpx::diagnostic_information(detail::access_exception(e));
+    }
+
+    throwmode get_throwmode(hpx::error_code const& ec)
+    {
+        return (ec.category() == hpx::get_lightweight_hpx_category()) ?
+            hpx::lightweight : hpx::plain;
+    }
+
+    throwmode get_rethrowmode(hpx::error_code const& ec)
+    {
+        return (ec.category() == hpx::get_lightweight_hpx_category()) ?
+            hpx::lightweight_rethrow : hpx::rethrow;
     }
 
     ///////////////////////////////////////////////////////////////////////////

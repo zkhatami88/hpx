@@ -7,6 +7,9 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
+#include <hpx/exception/diagnostic_information.hpp>
+#include <hpx/exception/detail/command_line_error.hpp>
+#include <hpx/exception/detail/get_execution_environment.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/util/command_line_handling.hpp>
@@ -43,6 +46,7 @@
 #include <new>
 #include <memory>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>

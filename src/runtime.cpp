@@ -7,7 +7,8 @@
 #include <hpx/config.hpp>
 
 #include <hpx/state.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/exception/detail/report_exception.hpp>
 #include <hpx/version.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/runtime/get_config_entry.hpp>

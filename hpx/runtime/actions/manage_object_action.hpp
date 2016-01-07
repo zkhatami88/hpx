@@ -13,7 +13,6 @@
 #include <boost/cstdint.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/array.hpp>
 #include <hpx/runtime/serialization/base_object.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>

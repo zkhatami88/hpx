@@ -9,8 +9,9 @@
 
 #if defined(HPX_HAVE_HWLOC)
 
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/util/spinlock.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/hwloc_topology.hpp>
 

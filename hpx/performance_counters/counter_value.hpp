@@ -6,7 +6,7 @@
 #if !defined(HPX_PERFORMANCE_COUNTERS_COUNTER_VALUE_HPP)
 #define HPX_PERFORMANCE_COUNTERS_COUNTER_VALUE_HPP
 
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/performance_counters/counter_status.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 

@@ -7,7 +7,7 @@
 #define HPX_APPLIER_APPLY_CALLBACK_DEC_16_2012_1228PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 
 #include <hpx/runtime/applier/apply.hpp>
 

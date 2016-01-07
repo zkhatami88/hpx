@@ -9,7 +9,7 @@
 #define HPX_RUNTIME_GET_PTR_SEP_18_2013_0622PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>

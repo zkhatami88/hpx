@@ -8,7 +8,6 @@
 #if !defined(HPX_COMPONENTS_SERVER_CREATE_COMPONENT_FWD_JUN_22_2015_0206PM)
 #define HPX_COMPONENTS_SERVER_CREATE_COMPONENT_FWD_JUN_22_2015_0206PM
 
-#include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/unique_function.hpp>
 

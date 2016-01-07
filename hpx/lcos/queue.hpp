@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_QUEUE_FEB_10_2011_1232PM)
 #define HPX_LCOS_QUEUE_FEB_10_2011_1232PM
 
-#include <hpx/exception.hpp>
+#include <hpx/exception/get_exception.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/lcos/server/queue.hpp>
 

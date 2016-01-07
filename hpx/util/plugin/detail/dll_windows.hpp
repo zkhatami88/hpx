@@ -16,11 +16,11 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <boost/throw_exception.hpp>
 #include <utility>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/plugin/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 
 #include <windows.h>
 #include <Shlwapi.h>

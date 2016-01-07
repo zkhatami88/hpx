@@ -7,7 +7,6 @@
 #define HPX_UTIL_PAPI_THREAD_MAPPER_FEB_17_2012_0109PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <map>

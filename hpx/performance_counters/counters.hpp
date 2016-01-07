@@ -7,7 +7,6 @@
 #define HPX_PERFORMANCE_COUNTERS_MAR_01_2009_0134PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/counter_status.hpp>
 #include <hpx/performance_counters/counter_type.hpp>

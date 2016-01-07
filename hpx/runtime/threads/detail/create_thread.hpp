@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_THREADS_DETAIL_CREATE_THREAD_JAN_13_2013_0439PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>

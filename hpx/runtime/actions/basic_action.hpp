@@ -11,6 +11,7 @@
 #define HPX_RUNTIME_ACTIONS_BASIC_ACTION_NOV_14_2008_0711PM
 
 #include <hpx/config.hpp>
+#include <hpx/exception/thread_interrupted.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/runtime/get_lva.hpp>

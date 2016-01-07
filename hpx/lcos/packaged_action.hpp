@@ -8,7 +8,7 @@
 #define HPX_LCOS_PACKAGED_ACTION_JUN_27_2008_0420PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/get_exception.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/promise.hpp>
 #include <hpx/runtime/actions/component_action.hpp>

@@ -6,7 +6,6 @@
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
-#include <hpx/exception.hpp>
 #include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -15,6 +14,7 @@
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <memory>

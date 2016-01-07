@@ -5,7 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/defines.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/exception/detail/backtrace.hpp>
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>

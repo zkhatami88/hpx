@@ -8,7 +8,7 @@
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/unlock_guard.hpp>
@@ -17,6 +17,7 @@
 #include <hpx/runtime/applier/trigger.hpp>
 #include <hpx/lcos/base_lco.hpp>
 
+#include <boost/exception_ptr.hpp>
 #include <boost/intrusive/slist.hpp>
 #include <boost/thread/locks.hpp>
 

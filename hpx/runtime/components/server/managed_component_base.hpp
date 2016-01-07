@@ -8,7 +8,7 @@
 #define HPX_COMPONENTS_MANAGED_COMPONENT_BASE_JUN_04_2008_0902PM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/traits/is_component.hpp>
 #include <hpx/runtime/components_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -18,7 +18,6 @@
 #include <hpx/util/reinitializable_static.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/throw_exception.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/bool.hpp>

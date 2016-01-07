@@ -6,6 +6,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
+#include <hpx/exception/throw.hpp>
+#include <hpx/exception/detail/command_line_error.hpp>
 #include <hpx/version.hpp>
 #include <hpx/util/asio_util.hpp>
 #include <hpx/util/batch_environment.hpp>

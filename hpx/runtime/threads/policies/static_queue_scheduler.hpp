@@ -11,7 +11,6 @@
 #include <memory>
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>

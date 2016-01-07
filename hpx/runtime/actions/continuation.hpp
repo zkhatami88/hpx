@@ -7,7 +7,7 @@
 #define HPX_RUNTIME_ACTIONS_CONTINUATION_JUN_13_2008_1031AM
 
 #include <hpx/config.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/runtime/find_here.hpp>
 #include <hpx/runtime/trigger_lco.hpp>
 #include <hpx/runtime/actions/basic_action_fwd.hpp>
@@ -21,6 +21,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/invoke.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/result_of.hpp>
 #include <hpx/util/unique_function.hpp>
 

@@ -8,13 +8,15 @@
 #ifndef HPX_SERIALIZATION_POLYMORPHIC_ID_FACTORY_HPP
 #define HPX_SERIALIZATION_POLYMORPHIC_ID_FACTORY_HPP
 
+#include <hpx/error.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/runtime/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/traits/polymorphic_traits.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/exception.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/unordered_map.hpp>

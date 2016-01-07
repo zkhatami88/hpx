@@ -7,7 +7,8 @@
 #if !defined(HPX_COMPONENTS_SERVER_DESTROY_COMPONENT_JUN_02_2008_0146PM)
 #define HPX_COMPONENTS_SERVER_DESTROY_COMPONENT_JUN_02_2008_0146PM
 
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/applier/applier.hpp>

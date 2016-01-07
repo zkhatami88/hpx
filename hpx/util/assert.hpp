@@ -37,13 +37,8 @@
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
 #include <hpx/config.hpp>
+#include <hpx/exception/assertion_failed.hpp>
 #include <boost/current_function.hpp>
-
-namespace hpx
-{
-    HPX_EXPORT void assertion_failed(char const * expr,
-        char const * function, char const * file, long line);  // user defined
-} // namespace hpx
 
 #define HPX_ASSERT(expr) (HPX_LIKELY(!!(expr)) \
   ? ((void)0) \
@@ -73,13 +68,8 @@ namespace hpx
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
 #include <hpx/config.hpp>
+#include <hpx/exception/assertion_failed.hpp>
 #include <boost/current_function.hpp>
-
-namespace hpx
-{
-    HPX_EXPORT void assertion_failed_msg(char const * expr, char const * msg,
-           char const * function, char const * file, long line); // user defined
-} // namespace hpx
 
 #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \

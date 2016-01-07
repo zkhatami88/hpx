@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
+#include <hpx/util/logging.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/runtime/threads/this_thread.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>

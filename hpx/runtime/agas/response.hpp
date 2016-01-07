@@ -10,7 +10,7 @@
 #define HPX_FB40C7A4_33B0_4C64_A16B_2A3FEEB237ED
 
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
 #include <hpx/runtime/agas/gva.hpp>

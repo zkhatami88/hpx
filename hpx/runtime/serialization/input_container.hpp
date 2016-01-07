@@ -8,8 +8,9 @@
 #define HPX_SERIALIZATION_INPUT_CONTAINER_HPP
 
 #include <hpx/config.hpp>
+#include <hpx/error.hpp>
+#include <hpx/exception/throw.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/exception.hpp>
 #include <hpx/runtime/serialization/container.hpp>
 #include <hpx/runtime/serialization/serialization_chunk.hpp>
 #include <hpx/runtime/serialization/binary_filter.hpp>

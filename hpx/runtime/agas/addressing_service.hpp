@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/exception.hpp>
+#include <hpx/exception_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
