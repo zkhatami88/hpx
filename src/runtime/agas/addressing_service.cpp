@@ -121,70 +121,6 @@ struct addressing_service::hosted_data_type
     server::symbol_namespace symbol_ns_server_;
 }; // }}}
 
-struct addressing_service::gva_cache_key
-{ // {{{ gva_cache_key implementation
-  private:
-    typedef boost::icl::closed_interval<naming::gid_type, std::less>
-        key_type;
-
-    key_type key_;
-
-  public:
-    gva_cache_key()
-      : key_()
-    {}
-
-    explicit gva_cache_key(
-        naming::gid_type const& id_
-      , boost::uint64_t count_ = 1
-        )
-      : key_(naming::detail::get_stripped_gid(id_)
-           , naming::detail::get_stripped_gid(id_) + (count_ - 1))
-    {
-        HPX_ASSERT(count_);
-    }
-
-    naming::gid_type get_gid() const
-    {
-        return boost::icl::lower(key_);
-    }
-
-    boost::uint64_t get_count() const
-    {
-        naming::gid_type const size = boost::icl::length(key_);
-        HPX_ASSERT(size.get_msb() == 0);
-        return size.get_lsb();
-    }
-
-    friend bool operator<(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        return boost::icl::exclusive_less(lhs.key_, rhs.key_);
-    }
-
-    friend bool operator==(
-        gva_cache_key const& lhs
-      , gva_cache_key const& rhs
-        )
-    {
-        // Direct hit
-        if(lhs.key_ == rhs.key_)
-            return true;
-
-        // Is lhs in rhs?
-        if (1 == lhs.get_count() && 1 != rhs.get_count())
-            return boost::icl::contains(rhs.key_, lhs.key_);
-
-        // Is rhs in lhs?
-        else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, rhs.key_);
-
-        return false;
-    }
-}; // }}}
-
 addressing_service::addressing_service(
     parcelset::parcelhandler& ph
   , util::runtime_configuration const& ini_
@@ -199,7 +135,6 @@ addressing_service::addressing_service(
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
-  , range_caching_(caching_ ? ini_.get_agas_range_caching_mode() : false)
   , action_priority_(ini_.get_agas_dedicated_server() ?
         threads::thread_priority_normal : threads::thread_priority_boost)
   , rts_lva_(0)
@@ -1083,17 +1018,9 @@ bool addressing_service::bind_range_local(
         if (ec || (success != s && repeated_request != s))
             return false;
 
-        if (range_caching_)
-        {
-            // Put the range into the cache.
-            update_cache_entry(lower_id, g, ec);
-        }
-        else
-        {
-            // Only put the first GID in the range into the cache
-            gva const first_g = g.resolve(lower_id, lower_id);
-            update_cache_entry(lower_id, first_g, ec);
-        }
+        // Only put the first GID in the range into the cache
+        gva const first_g = g.resolve(lower_id, lower_id);
+        update_cache_entry(lower_id, first_g, ec);
 
         if (ec)
             return false;
@@ -1115,17 +1042,9 @@ bool addressing_service::bind_postproc(
     if (success != s && repeated_request != s)
         return false;
 
-    if(range_caching_)
-    {
-        // Put the range into the cache.
-        update_cache_entry(lower_id, g);
-    }
-    else
-    {
-        // Only put the first GID in the range into the cache
-        gva const first_g = g.resolve(lower_id, lower_id);
-        update_cache_entry(lower_id, first_g);
-    }
+    // Only put the first GID in the range into the cache
+    gva const first_g = g.resolve(lower_id, lower_id);
+    update_cache_entry(lower_id, first_g);
 
     return true;
 }
@@ -1482,16 +1401,8 @@ bool addressing_service::resolve_full_local(
         if (naming::detail::store_in_cache(id))
         {
             HPX_ASSERT(addr.address_);
-            if(range_caching_)
-            {
-                // Put the range into the cache.
-                update_cache_entry(base_gid, base_gva, ec);
-            }
-            else
-            {
-                // Put the fully resolved gva into the cache.
-                update_cache_entry(id, g, ec);
-            }
+            // Put the fully resolved gva into the cache.
+            update_cache_entry(id, g, ec);
         }
 
         if (ec)
@@ -1559,12 +1470,11 @@ bool addressing_service::resolve_cached(
 
     // first look up the requested item in the cache
     gva g;
-    naming::gid_type idbase;
-    if (get_cache_entry(id, g, idbase, ec))
+    if (get_cache_entry(id, g, ec))
     {
         addr.locality_ = g.prefix;
         addr.type_ = g.type;
-        addr.address_ = g.lva(id, idbase);
+        addr.address_ = g.lva();
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1676,16 +1586,8 @@ naming::address addressing_service::resolve_full_postproc(
 
     if (naming::detail::store_in_cache(id))
     {
-        if (range_caching_)
-        {
-            // Put the range into the cache.
-            update_cache_entry(base_gid, base_gva);
-        }
-        else
-        {
-            // Put the fully resolved gva into the cache.
-            update_cache_entry(id, g);
-        }
+        // Put the fully resolved gva into the cache.
+        update_cache_entry(id, g);
     }
 
     return addr;
@@ -1787,16 +1689,8 @@ bool addressing_service::resolve_full_local(
 
             if (naming::detail::store_in_cache(gids[i]))
             {
-                if (range_caching_)
-                {
-                    // Put the range into the cache.
-                    update_cache_entry(base_gid, base_gva, ec);
-                }
-                else
-                {
-                    // Put the fully resolved gva into the cache.
-                    update_cache_entry(gids[i], g, ec);
-                }
+                // Put the fully resolved gva into the cache.
+                update_cache_entry(gids[i], g, ec);
             }
 
             if (ec)
@@ -2363,17 +2257,6 @@ bool addressing_service::iterate_ids(
     }
 } // }}}
 
-// This function has to return false if the key is already in the cache (true
-// means go ahead with the cache update).
-bool check_for_collisions(
-    addressing_service::gva_cache_key const& new_key
-  , addressing_service::gva_cache_key const& old_key
-    )
-{
-    return (new_key.get_gid() != old_key.get_gid())
-        || (new_key.get_count() != old_key.get_count());
-}
-
 void addressing_service::update_cache_entry(
     naming::gid_type const& id
   , gva const& g
@@ -2408,45 +2291,13 @@ void addressing_service::update_cache_entry(
     }
 
     try {
-        // The entry in AGAS for a locality's RTS component has a count of 0,
-        // so we convert it to 1 here so that the cache doesn't break.
-        const boost::uint64_t count = (g.count ? g.count : 1);
-
         LAGAS_(debug) <<
             ( boost::format(
-            "addressing_service::update_cache_entry, gid(%1%), count(%2%)"
-            ) % gid % count);
+            "addressing_service::update_cache_entry, gid(%1%)"
+            ) % gid);
 
-        const gva_cache_key key(gid, count);
-
-        {
-            boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
-            if (!gva_cache_->update_if(key, g, check_for_collisions))
-            {
-                if (LAGAS_ENABLED(warning))
-                {
-                    // Figure out who we collided with.
-                    addressing_service::gva_cache_key idbase;
-                    addressing_service::gva_cache_type::entry_type e;
-
-                    if (!gva_cache_->get_entry(key, idbase, e))
-                    {
-                        // This is impossible under sane conditions.
-                        HPX_THROWS_IF(ec, invalid_data
-                          , "addressing_service::update_cache_entry"
-                          , "data corruption or lock error occurred in cache");
-                        return;
-                    }
-
-                    LAGAS_(warning) <<
-                        ( boost::format(
-                            "addressing_service::update_cache_entry, "
-                            "aborting update due to key collision in cache, "
-                            "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
-                        ) % gid % count % idbase.get_gid() % idbase.get_count());
-                }
-            }
-        }
+        boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        gva_cache_->update(gid, g);
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -2459,32 +2310,13 @@ void addressing_service::update_cache_entry(
 bool addressing_service::get_cache_entry(
     naming::gid_type const& gid
   , gva& gva
-  , naming::gid_type& idbase
   , error_code& ec
     )
 {
-    gva_cache_key k(gid);
-    gva_cache_key idbase_key;
+    naming::gid_type k(gid);
 
     mutex_type::scoped_lock lock(gva_cache_mtx_);
-    if(gva_cache_->get_entry(k, idbase_key, gva))
-    {
-        const boost::uint64_t id_msb =
-            naming::detail::strip_internal_bits_from_gid(gid.get_msb());
-
-        if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
-        {
-            lock.unlock();
-            HPX_THROWS_IF(ec, internal_server_error
-              , "addressing_service::get_cache_entry"
-              , "bad entry in cache, MSBs of GID base and GID do not match");
-            return false;
-        }
-        idbase = idbase_key.get_gid();
-        return true;
-    }
-
-    return false;
+    return gva_cache_->get_entry(k, gva);
 }
 
 
@@ -2553,9 +2385,9 @@ void addressing_service::remove_cache_entry(
         boost::lock_guard<mutex_type> lock(gva_cache_mtx_);
 
         gva_cache_->erase(
-            [&gid](std::pair<gva_cache_key, gva> const& p)
+            [&gid](std::pair<naming::gid_type, gva> const& p)
             {
-                return gid == p.first.get_gid();
+                return gid == p.first;
             });
 
         if (&ec != &throws)

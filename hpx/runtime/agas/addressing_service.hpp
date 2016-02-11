@@ -66,10 +66,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     // }}}
 
     // {{{ gva cache
-    struct gva_cache_key;
-
     typedef boost::cache::lru_cache<
-        gva_cache_key
+        naming::gid_type
       , gva
       , boost::cache::statistics::local_full_statistics
     > gva_cache_type;
@@ -102,7 +100,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     runtime_mode const runtime_type;
 
     bool const caching_;
-    bool const range_caching_;
     threads::thread_priority const action_priority_;
 
     boost::uint64_t rts_lva_;
@@ -1418,7 +1415,6 @@ public:
     bool get_cache_entry(
         naming::gid_type const& gid
       , gva& gva
-      , naming::gid_type& idbase
       , error_code& ec = throws
         );
 
