@@ -173,6 +173,9 @@ namespace hpx { namespace traits
     template <typename Range, typename Enable = void>
     struct is_future_range;
 
+    template <typename Iter, typename Enable = void>
+    struct future_iterator_traits;
+
     template <typename Range, typename Enable = void>
     struct future_range_traits;
 

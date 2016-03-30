@@ -140,6 +140,7 @@ namespace hpx
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
@@ -371,7 +372,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+        std::vector<typename traits::future_iterator_traits<Iterator>::type> >
     lcos::future<Container>
     when_all(Iterator begin, Iterator end)
     {
@@ -398,7 +399,7 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+        std::vector<typename traits::future_iterator_traits<Iterator>::type> >
     lcos::future<Container>
     when_all_n(Iterator begin, std::size_t count)
     {

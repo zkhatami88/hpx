@@ -108,6 +108,7 @@ namespace hpx
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -359,7 +360,7 @@ namespace hpx { namespace lcos
     when_each(F&& f, Iterator begin, Iterator end)
     {
         typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+            typename traits::future_iterator_traits<Iterator>::type
             future_type;
 
         std::vector<future_type> lazy_values_;
@@ -376,7 +377,7 @@ namespace hpx { namespace lcos
     when_each_n(F&& f, Iterator begin, std::size_t count)
     {
         typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+            typename traits::future_iterator_traits<Iterator>::type
             future_type;
 
         std::vector<future_type> lazy_values_;

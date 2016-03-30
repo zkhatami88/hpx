@@ -127,6 +127,7 @@ namespace hpx
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/acquire_future.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/tuple.hpp>
@@ -394,7 +395,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+        std::vector<typename traits::future_iterator_traits<Iterator>::type> >
     lcos::future<when_any_result<Container> >
     when_any(Iterator begin, Iterator end)
     {
@@ -422,7 +423,7 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Container =
-        std::vector<typename lcos::detail::future_iterator_traits<Iterator>::type> >
+        std::vector<typename traits::future_iterator_traits<Iterator>::type> >
     lcos::future<when_any_result<Container> >
     when_any_n(Iterator begin, std::size_t count)
     {

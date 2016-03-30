@@ -89,6 +89,7 @@ namespace hpx
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -337,11 +338,11 @@ namespace hpx { namespace lcos
 
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
+        typename traits::future_iterator_traits<Iterator>::type
     >::type
     wait_all(Iterator begin, Iterator end)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename traits::future_iterator_traits<Iterator>::type
             future_type;
         typedef typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;
@@ -358,7 +359,7 @@ namespace hpx { namespace lcos
     Iterator
     wait_all_n(Iterator begin, std::size_t count)
     {
-        typedef typename lcos::detail::future_iterator_traits<Iterator>::type
+        typedef typename traits::future_iterator_traits<Iterator>::type
             future_type;
         typedef typename traits::detail::shared_state_ptr_for<future_type>::type
             shared_state_ptr;

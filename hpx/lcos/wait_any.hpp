@@ -142,6 +142,7 @@ namespace hpx
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/lcos/wait_some.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -178,7 +179,7 @@ namespace hpx { namespace lcos
 
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
+        typename traits::future_iterator_traits<Iterator>::type
     >::type
     wait_any(Iterator begin, Iterator end, error_code& ec = throws)
     {

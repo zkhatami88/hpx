@@ -152,6 +152,7 @@ namespace hpx
 #include <hpx/lcos/local/futures_factory.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/traits/future_iterator_traits.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -390,13 +391,13 @@ namespace hpx { namespace lcos
 
     template <typename Iterator>
     typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type
+        typename traits::future_iterator_traits<Iterator>::type
     >::type
     wait_some(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
         typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+            typename traits::future_iterator_traits<Iterator>::type
             future_type;
         typedef
             typename traits::detail::shared_state_ptr_for<future_type>::type
@@ -420,7 +421,7 @@ namespace hpx { namespace lcos
         std::size_t count, error_code& ec = throws)
     {
         typedef
-            typename lcos::detail::future_iterator_traits<Iterator>::type
+            typename traits::future_iterator_traits<Iterator>::type
             future_type;
         typedef
             typename traits::detail::shared_state_ptr_for<future_type>::type

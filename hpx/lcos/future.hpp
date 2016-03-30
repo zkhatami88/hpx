@@ -18,7 +18,6 @@
 #include <hpx/traits/future_traits.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/traits/concepts.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
@@ -41,7 +40,6 @@
 
 #include <type_traits>
 #include <utility>
-#include <iterator>
 
 namespace hpx { namespace lcos { namespace detail
 {
@@ -290,28 +288,6 @@ namespace hpx { namespace lcos { namespace detail
         typedef R result_type;
 
         typedef future<result_type> type;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
-    struct future_iterator_traits
-    {};
-
-    template <typename Iterator>
-    struct future_iterator_traits<Iterator,
-        typename hpx::util::always_void<
-#if defined(HPX_MSVC) && HPX_MSVC <= 1800       // MSVC12 needs special help
-            typename Iterator::iterator_category
-#else
-            typename std::iterator_traits<Iterator>::value_type
-#endif
-        >::type>
-    {
-        typedef
-            typename std::iterator_traits<Iterator>::value_type
-            type;
-
-        typedef hpx::traits::future_traits<type> traits_type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
