@@ -4,22 +4,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_FUTURE_MAR_06_2012_1059AM)
-#define HPX_LCOS_FUTURE_MAR_06_2012_1059AM
+#ifndef HPX_LCOS_FUTURE_HPP
+#define HPX_LCOS_FUTURE_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/error_code.hpp>
+#include <hpx/throw_exception.hpp>
 #include <hpx/lcos_fwd.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/detail/timed_future_data.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/traits/acquire_shared_state.hpp>
-#include <hpx/traits/is_callable.hpp>
-#include <hpx/traits/is_future.hpp>
 #include <hpx/traits/future_access.hpp>
 #include <hpx/traits/future_traits.hpp>
-#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_executor.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
-#include <hpx/util/always_void.hpp>
+#include <hpx/traits/is_future.hpp>
+#include <hpx/traits/is_launch_policy.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
@@ -32,11 +34,6 @@
 
 #include <boost/exception_ptr.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_void.hpp>
-#include <boost/utility/declval.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -52,11 +49,11 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        !std::is_void<typename traits::future_traits<Future>::type>::value
     >::type serialize_future_load(Archive& ar, Future& f)
     {
-        typedef typename hpx::traits::future_traits<Future>::type value_type;
+        typedef typename traits::future_traits<Future>::type value_type;
         typedef lcos::detail::future_data<value_type> shared_state;
 
         int state = future_state::invalid;
@@ -69,7 +66,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<shared_state> p(new shared_state());
             p->set_value(std::move(value));
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
             boost::exception_ptr exception;
             ar >> exception;
@@ -77,7 +74,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<shared_state> p(new shared_state());
             p->set_exception(exception);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
             f = Future();
         } else {
@@ -86,8 +83,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        std::is_void<typename traits::future_traits<Future>::type>::value
     >::type serialize_future_load(Archive& ar, Future& f) //-V659
     {
         typedef lcos::detail::future_data<void> shared_state;
@@ -97,9 +94,9 @@ namespace hpx { namespace lcos { namespace detail
         if (state == future_state::has_value)
         {
             boost::intrusive_ptr<shared_state> p(new shared_state());
-            p->set_value(hpx::util::unused);
+            p->set_value(util::unused);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::has_exception) {
             boost::exception_ptr exception;
             ar >> exception;
@@ -107,7 +104,7 @@ namespace hpx { namespace lcos { namespace detail
             boost::intrusive_ptr<shared_state> p(new shared_state());
             p->set_exception(exception);
 
-            f = hpx::traits::future_access<Future>::create(std::move(p));
+            f = traits::future_access<Future>::create(std::move(p));
         } else if (state == future_state::invalid) {
             f = Future();
         } else {
@@ -116,18 +113,18 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::disable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        !std::is_void<typename traits::future_traits<Future>::type>::value
     >::type serialize_future_save(Archive& ar, Future const& f)
     {
-        typedef typename hpx::traits::future_traits<Future>::result_type value_type;
+        typedef typename traits::future_traits<Future>::result_type value_type;
 
         if(ar.is_future_awaiting())
         {
             if(!f.is_ready())
             {
-                typename hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                typename traits::detail::shared_state_ptr_for<Future>::type state
+                    = traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
@@ -138,7 +135,7 @@ namespace hpx { namespace lcos { namespace detail
                 if(f.is_ready() && f.has_value())
                 {
                     value_type const & value =
-                        *hpx::traits::future_access<Future>::
+                        *traits::future_access<Future>::
                             get_shared_state(f)->get_result();
                     ar << value; //-V128
                 }
@@ -165,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail
             else
             {
                 value_type const & value =
-                    *hpx::traits::future_access<Future>::
+                    *traits::future_access<Future>::
                         get_shared_state(f)->get_result();
                 ar << state << value; //-V128
             }
@@ -180,8 +177,8 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     template <typename Archive, typename Future>
-    typename boost::enable_if<
-        boost::is_void<typename hpx::traits::future_traits<Future>::type>
+    typename std::enable_if<
+        std::is_void<typename traits::future_traits<Future>::type>::value
     >::type serialize_future_save(Archive& ar, Future const& f) //-V659
     {
         if(ar.is_future_awaiting())
@@ -189,8 +186,8 @@ namespace hpx { namespace lcos { namespace detail
             if(!f.is_ready())
             {
                 typename
-                    hpx::traits::detail::shared_state_ptr_for<Future>::type state
-                    = hpx::traits::future_access<Future>::get_shared_state(f);
+                    traits::detail::shared_state_ptr_for<Future>::type state
+                    = traits::future_access<Future>::get_shared_state(f);
 
                 state->execute_deferred();
 
@@ -233,8 +230,25 @@ namespace hpx { namespace lcos { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename F, typename Enable = void>
+    template <
+        typename Future, typename F
+      , bool Callable = traits::is_callable<F&(Future)>::value
+    >
     struct future_then_result
+    {
+        typedef typename util::result_of<F&(Future)>::type cont_result;
+
+        typedef typename std::conditional<
+            traits::detail::is_unique_future<cont_result>::value
+          , traits::future_traits<cont_result>
+          , util::result_of<F&(Future)>
+        >::type::type result_type;
+
+        typedef lcos::future<result_type> type;
+    };
+
+    template <typename Future, typename F>
+    struct future_then_result<Future, F, false>
     {
         typedef struct continuation_not_callable
         {
@@ -245,28 +259,9 @@ namespace hpx { namespace lcos { namespace detail
 
             ~continuation_not_callable()
             {
-                error(boost::declval<Future>(), boost::declval<F&>());
+                error(std::declval<Future>(), std::declval<F&>());
             }
         } type;
-    };
-
-    template <typename Future, typename F>
-    struct future_then_result<
-        Future, F
-      , typename hpx::util::always_void<
-            typename hpx::util::result_of<F(Future)>::type
-        >::type
-    >
-    {
-        typedef typename hpx::util::result_of<F(Future)>::type cont_result;
-
-        typedef typename boost::mpl::eval_if<
-            hpx::traits::detail::is_unique_future<cont_result>
-          , hpx::traits::future_traits<cont_result>
-          , boost::mpl::identity<cont_result>
-        >::type result_type;
-
-        typedef lcos::future<result_type> type;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -297,7 +292,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         template <typename U>
         HPX_FORCEINLINE static
-        U get(U && u)
+        U get(U&& u)
         {
             return std::forward<U>(u);
         }
@@ -330,7 +325,7 @@ namespace hpx { namespace lcos { namespace detail
       : future_data_result<void>
     {
         HPX_FORCEINLINE static
-        void get(hpx::util::unused_type)
+        void get(util::unused_type)
         {}
 
         static void get_default()
@@ -344,29 +339,14 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult>
     struct continuation_result;
 
-    template <typename ContResult, typename Future, typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
+    template <typename ContResult, typename Future, typename Policy, typename F>
+    inline typename traits::detail::shared_state_ptr<
         typename continuation_result<ContResult>::type
-    >::type
-    make_continuation(Future const& future, launch policy,
-        F && f);
-
-    template <typename ContResult, typename Future, typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation(Future const& future, threads::executor& sched,
-        F && f);
-    template <typename ContResult, typename Future, typename Executor,
-        typename F>
-    inline typename hpx::traits::detail::shared_state_ptr<
-        typename continuation_result<ContResult>::type
-    >::type
-    make_continuation_exec(Future const& future, Executor& exec, F && f);
+    >::type make_continuation(Future const& future, Policy&& policy, F&& f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    typename hpx::traits::detail::shared_state_ptr<
+    typename traits::detail::shared_state_ptr<
         typename future_unwrap_result<Future>::result_type>::type
     unwrap(Future&& future, error_code& ec = throws);
 
@@ -374,7 +354,7 @@ namespace hpx { namespace lcos { namespace detail
     class void_continuation;
 
     template <typename Future>
-    inline typename hpx::traits::detail::shared_state_ptr<void>::type
+    inline typename traits::detail::shared_state_ptr<void>::type
     make_void_continuation(Future& future);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -396,7 +376,7 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         explicit future_base(
-            boost::intrusive_ptr<shared_state_type> && p
+            boost::intrusive_ptr<shared_state_type>&& p
         ) : shared_state_(std::move(p))
         {}
 
@@ -404,7 +384,7 @@ namespace hpx { namespace lcos { namespace detail
           : shared_state_(other.shared_state_)
         {}
 
-        future_base(future_base && other) HPX_NOEXCEPT
+        future_base(future_base&& other) HPX_NOEXCEPT
           : shared_state_(std::move(other.shared_state_))
         {
             other.shared_state_ = 0;
@@ -424,7 +404,7 @@ namespace hpx { namespace lcos { namespace detail
             return *this;
         }
 
-        future_base& operator=(future_base && other) HPX_NOEXCEPT
+        future_base& operator=(future_base&& other) HPX_NOEXCEPT
         {
             if (this != &other)
             {
@@ -512,108 +492,36 @@ namespace hpx { namespace lcos { namespace detail
         //   - valid() == false on original future object immediately after it
         //     returns.
         template <typename F>
-        typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<F>::value ||
-            hpx::traits::is_threads_executor<F>::value ||
-            hpx::traits::is_executor<F>::value
+        typename std::enable_if<
+            !traits::is_launch_policy<F>::value &&
+            !traits::is_threads_executor<F>::value &&
+            !traits::is_executor<F>::value
           , future_then_result<Derived, F>
-        >::type
-        then(F && f, error_code& ec = throws) const
+        >::type::type
+        then(F&& f, error_code& ec = throws) const
         {
             return then(launch::all, std::forward<F>(f), ec);
         }
 
-        template <typename F>
+        template <typename Policy, typename F>
         typename future_then_result<Derived, F>::type
-        then(launch policy, F && f, error_code& ec = throws) const
+        then(Policy&& policy, F&& f, error_code& ec = throws) const
         {
             typedef
                 typename future_then_result<Derived, F>::result_type
                 result_type;
-
-            if (!shared_state_)
-            {
-                HPX_THROWS_IF(ec, no_state,
-                    "future_base<R>::then",
-                    "this future has no valid shared state");
-                return future<result_type>();
-            }
-
             typedef
-                typename hpx::util::result_of<F(Derived)>::type
+                typename util::result_of<F&(Derived)>::type
                 continuation_result_type;
             typedef
-                typename hpx::traits::detail::shared_state_ptr<result_type>::type
+                typename traits::detail::shared_state_ptr<result_type>::type
                 shared_state_ptr;
 
             shared_state_ptr p =
                 detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), policy, std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
-        }
-
-        template <typename F>
-        typename future_then_result<Derived, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws) const
-        {
-            typedef
-                typename future_then_result<Derived, F>::result_type
-                result_type;
-
-            if (!shared_state_)
-            {
-                HPX_THROWS_IF(ec, no_state,
-                    "future_base<R>::then",
-                    "this future has no valid shared state");
-                return future<result_type>();
-            }
-
-            typedef
-                typename hpx::util::result_of<F(Derived)>::type
-                continuation_result_type;
-            typedef
-                typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                shared_state_ptr;
-
-            shared_state_ptr p =
-                detail::make_continuation<continuation_result_type>(
-                    *static_cast<Derived const*>(this), sched, std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::create(
-                std::move(p));
-        }
-
-        template <typename Executor, typename F>
-        typename boost::lazy_enable_if_c<
-            hpx::traits::is_executor<Executor>::value
-          , future_then_result<Derived, F>
-        >::type
-        then(Executor& exec, F && f, error_code& ec = throws) const
-        {
-            typedef
-                typename future_then_result<Derived, F>::result_type
-                result_type;
-
-            if (!shared_state_)
-            {
-                HPX_THROWS_IF(ec, no_state,
-                    "future_base<R>::then",
-                    "this future has no valid shared state");
-                return future<result_type>();
-            }
-
-            typedef
-                typename hpx::util::result_of<F(Derived)>::type
-                continuation_result_type;
-            typedef
-                typename hpx::traits::detail::shared_state_ptr<result_type>::type
-                shared_state_ptr;
-
-            shared_state_ptr p =
-                detail::make_continuation_exec<continuation_result_type>(
-                    *static_cast<Derived const*>(this), exec,
-                    std::forward<F>(f));
-            return hpx::traits::future_access<future<result_type> >::
+                    *static_cast<Derived const*>(this),
+                    std::forward<Policy>(policy), std::forward<F>(f));
+            return traits::future_access<future<result_type> >::
                 create(std::move(p));
         }
 
@@ -642,7 +550,7 @@ namespace hpx { namespace lcos { namespace detail
         //     absolute timeout (30.2.4) specified by abs_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
         future_status
-        wait_until(hpx::util::steady_time_point const& abs_time,
+        wait_until(util::steady_time_point const& abs_time,
             error_code& ec = throws) const
         {
             if (!shared_state_)
@@ -667,7 +575,7 @@ namespace hpx { namespace lcos { namespace detail
         //     relative timeout (30.2.4) specified by rel_time has expired.
         // Throws: timeout-related exceptions (30.2.4).
         future_status
-        wait_for(hpx::util::steady_duration const& rel_time,
+        wait_for(util::steady_duration const& rel_time,
             error_code& ec = throws) const
         {
             return wait_until(rel_time.from_now(), ec);
@@ -709,10 +617,10 @@ namespace hpx { namespace lcos
 
     private:
         template <typename Future>
-        friend struct hpx::traits::future_access;
+        friend struct traits::future_access;
 
         template <typename Future, typename Enable>
-        friend struct hpx::traits::detail::future_access_customization_point;
+        friend struct traits::detail::future_access_customization_point;
 
         // Effects: constructs a future object from an shared state
         explicit future(
@@ -721,7 +629,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit future(
-            boost::intrusive_ptr<shared_state_type> && state
+            boost::intrusive_ptr<shared_state_type>&& state
         ) : base_type(std::move(state))
         {}
 
@@ -744,7 +652,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future && other) HPX_NOEXCEPT
+        future(future&& other) HPX_NOEXCEPT
           : base_type(std::move(other))
         {}
 
@@ -754,7 +662,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future<future> && other) HPX_NOEXCEPT
+        future(future<future>&& other) HPX_NOEXCEPT
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
         {}
 
@@ -764,7 +672,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        future(future<shared_future<R> > && other) HPX_NOEXCEPT
+        future(future<shared_future<R> >&& other) HPX_NOEXCEPT
           : base_type(other.valid() ? detail::unwrap(std::move(other)) : 0)
         {}
 
@@ -776,7 +684,7 @@ namespace hpx { namespace lcos
         //   - other.valid() == false.
         template <typename T>
         future(future<T>&& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename std::enable_if<std::is_void<R>::value, T>::type* = 0
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {
             other = future<T>();
@@ -795,7 +703,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        future& operator=(future && other) HPX_NOEXCEPT
+        future& operator=(future&& other) HPX_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -819,7 +727,7 @@ namespace hpx { namespace lcos
         // Throws: the stored exception, if an exception was stored in the
         //         shared state.
         // Postcondition: valid() == false.
-        typename hpx::traits::future_traits<future>::result_type
+        typename traits::future_traits<future>::result_type
         get()
         {
             if (!this->shared_state_)
@@ -838,7 +746,7 @@ namespace hpx { namespace lcos
             return detail::future_value<R>::get(std::move(*result));
         }
 
-        typename hpx::traits::future_traits<future>::result_type
+        typename traits::future_traits<future>::result_type
         get(error_code& ec)
         {
             if (!this->shared_state_)
@@ -866,43 +774,25 @@ namespace hpx { namespace lcos
         using base_type::has_exception;
 
         template <typename F>
-        typename boost::lazy_disable_if_c<
-            hpx::traits::is_launch_policy<F>::value ||
-            hpx::traits::is_threads_executor<F>::value ||
-            hpx::traits::is_executor<F>::value
+        typename std::enable_if<
+            !hpx::traits::is_launch_policy<F>::value &&
+            !hpx::traits::is_threads_executor<F>::value &&
+            !hpx::traits::is_executor<F>::value
           , detail::future_then_result<future, F>
-        >::type
-        then(F && f, error_code& ec = throws)
+        >::type::type
+        then(F&& f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
             return base_type::then(std::forward<F>(f), ec);
         }
 
-        template <typename F>
+        template <typename Policy, typename F>
         typename detail::future_then_result<future, F>::type
-        then(launch policy, F && f, error_code& ec = throws)
+        then(Policy&& policy, F&& f, error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return base_type::then(policy, std::forward<F>(f), ec);
-        }
-
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, F && f, error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::then(sched, std::forward<F>(f), ec);
-        }
-
-        template <typename Executor, typename F>
-        typename boost::lazy_enable_if_c<
-            hpx::traits::is_executor<Executor>::value
-          , detail::future_then_result<future, F>
-        >::type
-        then(Executor& exec, F && f, error_code& ec = throws)
-        {
-            invalidate on_exit(*this);
-            return base_type::then(exec, std::forward<F>(f), ec);
+            return base_type::then(
+                std::forward<Policy>(policy), std::forward<F>(f), ec);
         }
 
         using base_type::wait;
@@ -915,23 +805,23 @@ namespace hpx { namespace lcos
     {
         template <typename T, typename Future>
         typename std::enable_if<
-            std::is_convertible<Future, hpx::future<T> >::value,
-            hpx::future<T>
+            std::is_convertible<Future, future<T> >::value,
+            future<T>
         >::type
-        make_future_helper(Future && f)
+        make_future_helper(Future&& f)
         {
             return std::move(f);
         };
 
         template <typename T, typename Future>
         typename std::enable_if<
-           !std::is_convertible<Future, hpx::future<T> >::value,
-            hpx::future<T>
+           !std::is_convertible<Future, future<T> >::value,
+            future<T>
         >::type
-        make_future_helper(Future && f)
+        make_future_helper(Future&& f)
         {
             return f.then(
-                [](Future && f) -> T
+                [](Future&& f) -> T
                 {
                     return util::void_guard<T>(), f.get();
                 });
@@ -941,8 +831,8 @@ namespace hpx { namespace lcos
     // Allow to convert any future<U> into any other future<R> based on an
     // existing conversion path U --> R.
     template <typename R, typename U>
-    hpx::future<R>
-    make_future(hpx::future<U> && f)
+    future<R>
+    make_future(future<U>&& f)
     {
         static_assert(
             std::is_convertible<R, U>::value || std::is_void<R>::value,
@@ -956,23 +846,23 @@ namespace hpx { namespace lcos
     {
         template <typename T, typename Future, typename Conv>
         typename std::enable_if<
-            std::is_convertible<Future, hpx::future<T> >::value,
-            hpx::future<T>
+            std::is_convertible<Future, future<T> >::value,
+            future<T>
         >::type
-        convert_future_helper(Future && f, Conv && conv)
+        convert_future_helper(Future&& f, Conv&& conv)
         {
             return std::move(f);
         };
 
         template <typename T, typename Future, typename Conv>
         typename std::enable_if<
-           !std::is_convertible<Future, hpx::future<T> >::value,
-            hpx::future<T>
+           !std::is_convertible<Future, future<T> >::value,
+            future<T>
         >::type
-        convert_future_helper(Future && f, Conv && conv)
+        convert_future_helper(Future&& f, Conv&& conv)
         {
             return f.then(
-                [conv](Future && f) -> T
+                [conv](Future&& f) -> T
                 {
                     return hpx::util::invoke(conv, f.get());
                 });
@@ -982,8 +872,8 @@ namespace hpx { namespace lcos
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
-    hpx::future<R>
-    make_future(hpx::future<U> && f, Conv && conv)
+    future<R>
+    make_future(future<U>&& f, Conv&& conv)
     {
         return detail::convert_future_helper<R>(
             std::move(f), std::forward<Conv>(conv));
@@ -1004,10 +894,10 @@ namespace hpx { namespace lcos
 
     private:
         template <typename Future>
-        friend struct hpx::traits::future_access;
+        friend struct traits::future_access;
 
         template <typename Future, typename Enable>
-        friend struct hpx::traits::detail::future_access_customization_point;
+        friend struct traits::detail::future_access_customization_point;
 
         // Effects: constructs a future object from an shared state
         explicit shared_future(
@@ -1016,7 +906,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit shared_future(
-            boost::intrusive_ptr<shared_state_type> && state
+            boost::intrusive_ptr<shared_state_type>&& state
         ) : base_type(std::move(state))
         {}
 
@@ -1046,12 +936,12 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        shared_future(shared_future && other) HPX_NOEXCEPT
+        shared_future(shared_future&& other) HPX_NOEXCEPT
           : base_type(std::move(other))
         {}
 
-        shared_future(future<R> && other) HPX_NOEXCEPT
-          : base_type(hpx::traits::detail::get_shared_state(other))
+        shared_future(future<R>&& other) HPX_NOEXCEPT
+          : base_type(traits::detail::get_shared_state(other))
         {
             other = future<R>();
         }
@@ -1062,7 +952,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        shared_future(future<shared_future> && other) HPX_NOEXCEPT
+        shared_future(future<shared_future>&& other) HPX_NOEXCEPT
           : base_type(other.valid() ? detail::unwrap(other.share()) : 0)
         {}
 
@@ -1073,7 +963,7 @@ namespace hpx { namespace lcos
         //     constructor invocation.
         template <typename T>
         shared_future(shared_future<T> const& other,
-            typename boost::enable_if<boost::is_void<R>, T>::type* = 0
+            typename std::enable_if<std::is_void<R>::value, T>::type* = 0
         ) : base_type(other.valid() ? detail::make_void_continuation(other) : 0)
         {}
 
@@ -1102,7 +992,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        shared_future& operator=(shared_future && other) HPX_NOEXCEPT
+        shared_future& operator=(shared_future&& other) HPX_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -1119,7 +1009,7 @@ namespace hpx { namespace lcos
         // Throws: the stored exception, if an exception was stored in the
         //         shared state.
         // Postcondition: valid() == false.
-        typename hpx::traits::future_traits<shared_future>::result_type
+        typename traits::future_traits<shared_future>::result_type
         get() const //-V659
         {
             if (!this->shared_state_)
@@ -1135,7 +1025,7 @@ namespace hpx { namespace lcos
             // no error has been reported, return the result
             return detail::future_value<R>::get(*result);
         }
-        typename hpx::traits::future_traits<shared_future>::result_type
+        typename traits::future_traits<shared_future>::result_type
         get(error_code& ec) const //-V659
         {
             typedef typename shared_state_type::result_type result_type;
@@ -1176,8 +1066,8 @@ namespace hpx { namespace lcos
     // Allow to convert any shared_future<U> into any other future<R> based on
     // an existing conversion path U --> R.
     template <typename R, typename U>
-    hpx::shared_future<R>
-    make_future(hpx::shared_future<U> f)
+    shared_future<R>
+    make_future(shared_future<U> f)
     {
         static_assert(
             std::is_convertible<R, U>::value || std::is_void<R>::value,
@@ -1190,18 +1080,18 @@ namespace hpx { namespace lcos
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
-    hpx::future<R>
-    make_future(hpx::shared_future<U> const& f, Conv && conv)
+    future<R>
+    make_future(shared_future<U> const& f, Conv&& conv)
     {
         static_assert(
-            hpx::traits::is_callable<Conv(U), R>::value,
+            traits::is_callable<Conv(U), R>::value,
             "the argument type must be convertible to the requested "
             "result type by using the supplied conversion function");
 
         return f.then(
-            [conv](hpx::shared_future<U> const& f)
+            [conv](shared_future<U> const& f)
             {
-                return hpx::util::invoke(conv, f.get());
+                return util::invoke(conv, f.get());
             });
     }
 }}
@@ -1211,16 +1101,16 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
-    make_ready_future(Result && init)
+    future<typename util::decay_unwrap<Result>::type>
+    make_ready_future(Result&& init)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
+        typedef typename util::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_value(std::forward<Result>(init));
 
-        return hpx::traits::future_access<future<result_type> >::create(std::move(p));
+        return traits::future_access<future<result_type> >::create(std::move(p));
     }
 
     // extension: create a pre-initialized future object which holds the
@@ -1233,7 +1123,7 @@ namespace hpx { namespace lcos
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_exception(e);
 
-        return hpx::traits::future_access<future<T> >::create(std::move(p));
+        return traits::future_access<future<T> >::create(std::move(p));
     }
 
     template <typename T, typename E>
@@ -1252,21 +1142,21 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
-    make_ready_future_at(hpx::util::steady_time_point const& abs_time,
+    future<typename util::decay_unwrap<Result>::type>
+    make_ready_future_at(util::steady_time_point const& abs_time,
         Result&& init)
     {
-        typedef typename hpx::util::decay_unwrap<Result>::type result_type;
+        typedef typename util::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
-        return hpx::traits::future_access<future<result_type> >::create(
+        return traits::future_access<future<result_type> >::create(
             new shared_state(abs_time.value(), std::forward<Result>(init)));
     }
 
     template <typename Result>
-    future<typename hpx::util::decay_unwrap<Result>::type>
-    make_ready_future_after(hpx::util::steady_duration const& rel_time,
-        Result && init)
+    future<typename util::decay_unwrap<Result>::type>
+    make_ready_future_after(util::steady_duration const& rel_time,
+        Result&& init)
     {
         return make_ready_future_at(rel_time.from_now(),
             std::forward<Result>(init));
@@ -1278,24 +1168,24 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<void> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_value(hpx::util::unused);
+        p->set_value(util::unused);
 
-        return hpx::traits::future_access<future<void> >::create(std::move(p));
+        return traits::future_access<future<void> >::create(std::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     inline future<void> make_ready_future_at(
-        hpx::util::steady_time_point const& abs_time)
+        util::steady_time_point const& abs_time)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
 
-        return hpx::traits::future_access<future<void> >::create(
-            new shared_state(abs_time.value(), hpx::util::unused));
+        return traits::future_access<future<void> >::create(
+            new shared_state(abs_time.value(), util::unused));
     }
 
     inline future<void> make_ready_future_after(
-        hpx::util::steady_duration const& rel_time)
+        util::steady_duration const& rel_time)
     {
         return make_ready_future_at(rel_time.from_now());
     }
@@ -1336,4 +1226,4 @@ namespace hpx
     hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))     \
     /**/
 
-#endif
+#endif /*HPX_LCOS_FUTURE_HPP*/

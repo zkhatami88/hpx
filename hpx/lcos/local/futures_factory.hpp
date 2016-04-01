@@ -10,10 +10,12 @@
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/detail/task_future_data.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/runtime/threads/thread_enums.hpp>
 #include <hpx/runtime/threads/thread_data_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
-#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/thread_description.hpp>
 
@@ -30,7 +32,7 @@ namespace hpx { namespace lcos { namespace local
     {
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, typename F,
-            typename Base = lcos::detail::task_base<Result> >
+            typename Base = lcos::detail::task_future_data<Result> >
         struct task_object : Base
         {
             typedef Base base_type;
@@ -117,10 +119,10 @@ namespace hpx { namespace lcos { namespace local
 
         template <typename Result, typename F>
         struct cancelable_task_object
-          : task_object<Result, F, lcos::detail::cancelable_task_base<Result> >
+          : task_object<Result, F, lcos::detail::cancellable_task_future_data<Result> >
         {
             typedef task_object<
-                    Result, F, lcos::detail::cancelable_task_base<Result>
+                    Result, F, lcos::detail::cancellable_task_future_data<Result>
                 > base_type;
             typedef typename base_type::result_type result_type;
 
@@ -156,7 +158,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Result, bool Cancelable>
         struct create_task_object
         {
-            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+            typedef boost::intrusive_ptr<lcos::detail::task_future_data<Result> >
                 return_type;
 
             template <typename F>
@@ -187,7 +189,7 @@ namespace hpx { namespace lcos { namespace local
         template <typename Result>
         struct create_task_object<Result, true>
         {
-            typedef boost::intrusive_ptr<lcos::detail::task_base<Result> >
+            typedef boost::intrusive_ptr<lcos::detail::task_future_data<Result> >
                 return_type;
 
             template <typename F>
@@ -221,7 +223,7 @@ namespace hpx { namespace lcos { namespace local
     class futures_factory<Result(), Cancelable>
     {
     protected:
-        typedef lcos::detail::task_base<Result> task_impl_type;
+        typedef lcos::detail::task_future_data<Result> task_impl_type;
 
     private:
         HPX_MOVABLE_ONLY(futures_factory);

@@ -9,19 +9,19 @@
 #include <hpx/traits.hpp>
 #include <hpx/util/unused.hpp>
 
-#include <boost/mpl/identity.hpp>
-
 namespace hpx { namespace traits
 {
     template <typename Result, typename Enable>
     struct promise_remote_result
-      : boost::mpl::identity<Result>
-    {};
+    {
+        typedef Result type;
+    };
 
     template <>
     struct promise_remote_result<void>
-      : boost::mpl::identity<util::unused_type>
-    {};
+    {
+        typedef util::unused_type type;
+    };
 }}
 
 #endif

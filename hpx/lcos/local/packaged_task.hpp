@@ -11,6 +11,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/detail/task_future_data.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/thread_description.hpp>

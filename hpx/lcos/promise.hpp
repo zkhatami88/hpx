@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/throw_exception.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
+#include <hpx/lcos/detail/task_future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -217,7 +218,7 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Result, typename RemoteResult>
     class promise_common
       : public promise_base<Result, RemoteResult>,
-        public task_base<Result>
+        public task_future_data<Result>
     {
     private:
         void do_run()
@@ -270,7 +271,7 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_exception(boost::exception_ptr const& e)
         {
-            return this->task_base<Result>::set_exception(e);
+            return this->task_future_data<Result>::set_exception(e);
         }
 
         void add_ref()
@@ -334,7 +335,7 @@ namespace hpx { namespace lcos { namespace detail
     public:
         Result get_value(error_code& /*ec*/ = throws)
         {
-            typedef typename task_base<Result>::result_type result_type;
+            typedef typename task_future_data<Result>::result_type result_type;
             result_type* result = this->get_result();
 
             // no error has been reported, return the result
