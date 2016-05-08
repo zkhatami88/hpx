@@ -5,11 +5,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_NAMING_NAME_MAR_24_2008_0942AM)
-#define HPX_NAMING_NAME_MAR_24_2008_0942AM
+#ifndef HPX_RUNTIME_NAMING_NAME_HPP
+#define HPX_RUNTIME_NAMING_NAME_HPP
 
 #include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock_pool.hpp>
+#include <hpx/runtime/naming_fwd.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 #include <hpx/traits/is_bitwise_serializable.hpp>
@@ -18,14 +19,12 @@
 #include <hpx/util/atomic_count.hpp>
 #include <hpx/util/register_locks_globally.hpp>
 
-#include <boost/io/ios_state.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/intrusive_ptr.hpp>
 
 #include <cstddef>
-#include <ios>
+#include <cstdint>
+#include <functional>
+#include <iosfwd>
 #include <iomanip>
-#include <iostream>
 #include <list>
 #include <mutex>
 #include <sstream>
@@ -46,17 +45,17 @@ namespace hpx { namespace naming
     {
         ///////////////////////////////////////////////////////////////////////
         // forward declaration
-        inline boost::uint64_t strip_internal_bits_from_gid(boost::uint64_t msb)
+        inline std::uint64_t strip_internal_bits_from_gid(std::uint64_t msb)
             HPX_SUPER_PURE;
 
-        inline boost::uint64_t strip_lock_from_gid(boost::uint64_t msb)
+        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb)
             HPX_SUPER_PURE;
 
-        inline boost::uint64_t get_internal_bits(boost::uint64_t msb)
+        inline std::uint64_t get_internal_bits(std::uint64_t msb)
             HPX_SUPER_PURE;
 
-        inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
-                boost::uint64_t msb) HPX_SUPER_PURE;
+        inline std::uint64_t strip_internal_bits_and_locality_from_gid(
+                std::uint64_t msb) HPX_SUPER_PURE;
 
         inline bool is_locked(gid_type const& gid);
     }
@@ -71,34 +70,34 @@ namespace hpx { namespace naming
         typedef gid_type size_type;
         typedef gid_type difference_type;
 
-        static boost::uint64_t const credit_base_mask = 0x1full;
-        static boost::uint16_t const credit_shift = 24;
+        static std::uint64_t const credit_base_mask = 0x1full;
+        static std::uint16_t const credit_shift = 24;
 
-        static boost::uint64_t const credit_mask = credit_base_mask << credit_shift;
-        static boost::uint64_t const was_split_mask = 0x80000000ull; //-V112
-        static boost::uint64_t const has_credits_mask = 0x40000000ull; //-V112
-        static boost::uint64_t const is_locked_mask = 0x20000000ull; //-V112
+        static std::uint64_t const credit_mask = credit_base_mask << credit_shift;
+        static std::uint64_t const was_split_mask = 0x80000000ull; //-V112
+        static std::uint64_t const has_credits_mask = 0x40000000ull; //-V112
+        static std::uint64_t const is_locked_mask = 0x20000000ull; //-V112
 
-        static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
-        static boost::uint16_t const locality_id_shift = 32; //-V112
+        static std::uint64_t const locality_id_mask = 0xffffffff00000000ull;
+        static std::uint16_t const locality_id_shift = 32; //-V112
 
-        static boost::uint64_t const virtual_memory_mask = 0x7fffffull;
+        static std::uint64_t const virtual_memory_mask = 0x7fffffull;
 
         // don't cache this id in the AGAS caches
-        static boost::uint64_t const dont_cache_mask = 0x800000ull; //-V112
+        static std::uint64_t const dont_cache_mask = 0x800000ull; //-V112
 
-        static boost::uint64_t const credit_bits_mask =
+        static std::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
-        static boost::uint64_t const internal_bits_mask =
+        static std::uint64_t const internal_bits_mask =
             credit_bits_mask | is_locked_mask | dont_cache_mask;
-        static boost::uint64_t const special_bits_mask =
+        static std::uint64_t const special_bits_mask =
             locality_id_mask | internal_bits_mask;
 
-        explicit gid_type (boost::uint64_t lsb_id = 0)
+        explicit gid_type (std::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
 
-        explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
+        explicit gid_type (std::uint64_t msb_id, std::uint64_t lsb_id)
           : id_msb_(naming::detail::strip_lock_from_gid(msb_id)),
             id_lsb_(lsb_id)
         {
@@ -121,7 +120,7 @@ namespace hpx { namespace naming
             HPX_ASSERT(!is_locked());
         }
 
-        gid_type& operator=(boost::uint64_t lsb_id)
+        gid_type& operator=(std::uint64_t lsb_id)
         {
             HPX_ASSERT(!is_locked());
             id_msb_ = 0;
@@ -188,10 +187,10 @@ namespace hpx { namespace naming
         gid_type operator+= (gid_type const& rhs)
         { return (*this = *this + rhs); }
 
-        // GID + boost::uint64_t
-        friend gid_type operator+ (gid_type const& lhs, boost::uint64_t rhs)
+        // GID + std::uint64_t
+        friend gid_type operator+ (gid_type const& lhs, std::uint64_t rhs)
         { return lhs + gid_type(0, rhs); }
-        gid_type operator+= (boost::uint64_t rhs)
+        gid_type operator+= (std::uint64_t rhs)
         { return (*this = *this + rhs); }
 
         // GID - GID
@@ -200,13 +199,13 @@ namespace hpx { namespace naming
         gid_type operator-= (gid_type const& rhs)
         { return (*this = *this - rhs); }
 
-        // GID - boost::uint64_t
-        friend gid_type operator- (gid_type const& lhs, boost::uint64_t rhs)
+        // GID - std::uint64_t
+        friend gid_type operator- (gid_type const& lhs, std::uint64_t rhs)
         { return lhs - gid_type(0, rhs); }
-        gid_type operator-= (boost::uint64_t rhs)
+        gid_type operator-= (std::uint64_t rhs)
         { return (*this = *this - rhs); }
 
-        friend gid_type operator& (gid_type const& lhs, boost::uint64_t rhs)
+        friend gid_type operator& (gid_type const& lhs, std::uint64_t rhs)
         {
             return gid_type(lhs.id_msb_, lhs.id_lsb_ & rhs);
         }
@@ -263,25 +262,25 @@ namespace hpx { namespace naming
             return !(lhs < rhs);
         }
 
-        boost::uint64_t get_msb() const
+        std::uint64_t get_msb() const
         {
             return id_msb_;
         }
-        void set_msb(boost::uint64_t msb)
+        void set_msb(std::uint64_t msb)
         {
             id_msb_ = msb;
         }
-        boost::uint64_t get_lsb() const
+        std::uint64_t get_lsb() const
         {
             return id_lsb_;
         }
-        void set_lsb(boost::uint64_t lsb)
+        void set_lsb(std::uint64_t lsb)
         {
             id_lsb_ = lsb;
         }
         void set_lsb(void* lsb)
         {
-            id_lsb_ = reinterpret_cast<boost::uint64_t>(lsb);
+            id_lsb_ = reinterpret_cast<std::uint64_t>(lsb);
         }
 
         std::string to_string() const
@@ -341,7 +340,7 @@ namespace hpx { namespace naming
         mutex_type& get_mutex() const { return const_cast<mutex_type&>(*this); }
 
     private:
-        friend HPX_EXPORT std::ostream& operator<< (std::ostream& os,
+        friend HPX_EXPORT std::ostream& operator<<(std::ostream& os,
             gid_type const& id);
 
         friend class hpx::serialization::access;
@@ -388,8 +387,8 @@ namespace hpx { namespace naming
         friend bool detail::is_locked(gid_type const& gid);
 
         // actual gid
-        boost::uint64_t id_msb_;
-        boost::uint64_t id_lsb_;
+        std::uint64_t id_msb_;
+        std::uint64_t id_lsb_;
     };
 }}
 
@@ -407,26 +406,26 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
+    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
         HPX_SUPER_PURE;
 
-    inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id)
+    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id)
     {
         return gid_type(
-            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
             0);
     }
 
-    inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb) HPX_PURE;
 
-    inline boost::uint32_t get_locality_id_from_gid(boost::uint64_t msb)
+    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb)
     {
-        return boost::uint32_t(msb >> gid_type::locality_id_shift) - 1;
+        return std::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
-    inline boost::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_gid(gid_type const& id) HPX_PURE;
 
-    inline boost::uint32_t get_locality_id_from_gid(gid_type const& id)
+    inline std::uint32_t get_locality_id_from_gid(gid_type const& id)
     {
         return get_locality_id_from_gid(id.get_msb());
     }
@@ -441,23 +440,23 @@ namespace hpx { namespace naming
         return get_locality_from_gid(gid) == gid;
     }
 
-    inline boost::uint64_t replace_locality_id(boost::uint64_t msb,
-        boost::uint32_t locality_id) HPX_PURE;
+    inline std::uint64_t replace_locality_id(std::uint64_t msb,
+        std::uint32_t locality_id) HPX_PURE;
 
-    inline boost::uint64_t replace_locality_id(boost::uint64_t msb,
-        boost::uint32_t locality_id)
+    inline std::uint64_t replace_locality_id(std::uint64_t msb,
+        std::uint32_t locality_id)
     {
         msb &= ~gid_type::locality_id_mask;
         return msb | get_gid_from_locality_id(locality_id).get_msb();
     }
 
     inline gid_type replace_locality_id(gid_type const& gid,
-        boost::uint32_t locality_id) HPX_PURE;
+        std::uint32_t locality_id) HPX_PURE;
 
     inline gid_type replace_locality_id(gid_type const& gid,
-        boost::uint32_t locality_id)
+        std::uint32_t locality_id)
     {
-        boost::uint64_t msb = gid.get_msb() & ~gid_type::locality_id_mask;
+        std::uint64_t msb = gid.get_msb() & ~gid_type::locality_id_mask;
         msb |= get_gid_from_locality_id(locality_id).get_msb();
         return gid_type(msb, gid.get_lsb());
     }
@@ -472,9 +471,9 @@ namespace hpx { namespace naming
     namespace detail
     {
         // We store the log2(credit) in the gid_type
-        inline boost::int16_t log2(boost::int64_t val)
+        inline std::int16_t log2(std::int64_t val)
         {
-            boost::int16_t ret = -1;
+            std::int16_t ret = -1;
             while (val != 0)
             {
                 val >>= 1;
@@ -483,10 +482,10 @@ namespace hpx { namespace naming
             return ret;
         }
 
-        inline boost::int64_t power2(boost::int16_t log2credits)
+        inline std::int64_t power2(std::int16_t log2credits)
         {
             HPX_ASSERT(log2credits >= 0);
-            return static_cast<boost::int64_t>(1) << log2credits;
+            return static_cast<std::int64_t>(1) << log2credits;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -522,22 +521,22 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline boost::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
+        inline std::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
 
-        inline boost::int16_t get_log2credit_from_gid(gid_type const& id)
+        inline std::int16_t get_log2credit_from_gid(gid_type const& id)
         {
             HPX_ASSERT(has_credits(id));
-            return boost::int16_t((id.get_msb() >> gid_type::credit_shift) &
+            return std::int16_t((id.get_msb() >> gid_type::credit_shift) &
                     gid_type::credit_base_mask);
         }
 
-        inline boost::int64_t get_credit_from_gid(gid_type const& id)
+        inline std::int64_t get_credit_from_gid(gid_type const& id)
         {
             return has_credits(id) ? detail::power2(get_log2credit_from_gid(id)) : 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline boost::uint64_t strip_internal_bits_from_gid(boost::uint64_t msb)
+        inline std::uint64_t strip_internal_bits_from_gid(std::uint64_t msb)
         {
             return msb & ~gid_type::internal_bits_mask;
         }
@@ -548,8 +547,8 @@ namespace hpx { namespace naming
             return id;
         }
 
-        inline boost::uint64_t strip_internal_bits_except_dont_cache_from_gid(
-            boost::uint64_t msb)
+        inline std::uint64_t strip_internal_bits_except_dont_cache_from_gid(
+            std::uint64_t msb)
         {
             return msb & ~(gid_type::credit_bits_mask | gid_type::is_locked_mask);
         }
@@ -562,19 +561,19 @@ namespace hpx { namespace naming
             return id;
         }
 
-        inline boost::uint64_t get_internal_bits(boost::uint64_t msb)
+        inline std::uint64_t get_internal_bits(std::uint64_t msb)
         {
             return msb & gid_type::internal_bits_mask;
         }
 
-        inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
-                boost::uint64_t msb)
+        inline std::uint64_t strip_internal_bits_and_locality_from_gid(
+                std::uint64_t msb)
         {
             return msb & ~gid_type::special_bits_mask;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline boost::uint64_t strip_lock_from_gid(boost::uint64_t msb)
+        inline std::uint64_t strip_lock_from_gid(std::uint64_t msb)
         {
             return msb & ~gid_type::is_locked_mask;
         }
@@ -595,8 +594,8 @@ namespace hpx { namespace naming
 
         inline gid_type get_stripped_gid(gid_type const& id)
         {
-            boost::uint64_t const msb = strip_internal_bits_from_gid(id.get_msb());
-            boost::uint64_t const lsb = id.get_lsb();
+            std::uint64_t const msb = strip_internal_bits_from_gid(id.get_msb());
+            std::uint64_t const lsb = id.get_lsb();
             return gid_type(msb, lsb);
         }
 
@@ -605,13 +604,13 @@ namespace hpx { namespace naming
 
         inline gid_type get_stripped_gid_except_dont_cache(gid_type const& id)
         {
-            boost::uint64_t const msb =
+            std::uint64_t const msb =
                 strip_internal_bits_except_dont_cache_from_gid(id.get_msb());
-            boost::uint64_t const lsb = id.get_lsb();
+            std::uint64_t const lsb = id.get_lsb();
             return gid_type(msb, lsb);
         }
 
-        inline boost::uint64_t strip_credits_from_gid(boost::uint64_t msb)
+        inline std::uint64_t strip_credits_from_gid(std::uint64_t msb)
         {
             return msb & ~gid_type::credit_bits_mask;
         }
@@ -623,23 +622,23 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void set_log2credit_for_gid(gid_type& id, boost::int16_t log2credits)
+        inline void set_log2credit_for_gid(gid_type& id, std::int16_t log2credits)
         {
             // credit should be a clean log2
             HPX_ASSERT(log2credits >= 0);
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((boost::int32_t(log2credits) << gid_type::credit_shift)
+                ((std::int32_t(log2credits) << gid_type::credit_shift)
                     & gid_type::credit_mask) |
                 gid_type::has_credits_mask);
         }
 
-        inline void set_credit_for_gid(gid_type& id, boost::int64_t credits)
+        inline void set_credit_for_gid(gid_type& id, std::int64_t credits)
         {
             if (credits != 0)
             {
-                boost::int16_t log2credits = detail::log2(credits);
+                std::int16_t log2credits = detail::log2(credits);
                 HPX_ASSERT(detail::power2(log2credits) == credits);
 
                 set_log2credit_for_gid(id, log2credits);
@@ -652,21 +651,21 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // has side effects, can't be pure
-        HPX_EXPORT boost::int64_t add_credit_to_gid(gid_type& id,
-            boost::int64_t credits);
+        HPX_EXPORT std::int64_t add_credit_to_gid(gid_type& id,
+            std::int64_t credits);
 
-        HPX_EXPORT boost::int64_t remove_credit_from_gid(gid_type& id,
-            boost::int64_t debit);
+        HPX_EXPORT std::int64_t remove_credit_from_gid(gid_type& id,
+            std::int64_t debit);
 
-        HPX_EXPORT boost::int64_t fill_credit_for_gid(gid_type& id,
-            boost::int64_t credits = boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
+        HPX_EXPORT std::int64_t fill_credit_for_gid(gid_type& id,
+            std::int64_t credits = std::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);
         HPX_EXPORT gid_type move_gid_locked(std::unique_lock<gid_type::mutex_type> l,
             gid_type& gid);
 
-        HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
+        HPX_EXPORT std::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
         // splits the current credit of the given id and assigns half of it to
@@ -683,7 +682,7 @@ namespace hpx { namespace naming
     gid_type const invalid_gid = gid_type();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::ostream& operator<< (std::ostream& os, gid_type const& id);
+    HPX_EXPORT std::ostream& operator<<(std::ostream& os, gid_type const& id);
 
     namespace detail
     {
@@ -720,11 +719,11 @@ namespace hpx { namespace naming
               : count_(0), type_(unknown_deleter)
             {}
 
-            explicit id_type_impl (boost::uint64_t lsb_id, id_type_management t)
+            explicit id_type_impl (std::uint64_t lsb_id, id_type_management t)
               : gid_type(0, lsb_id), count_(0), type_(t)
             {}
 
-            explicit id_type_impl (boost::uint64_t msb_id, boost::uint64_t lsb_id,
+            explicit id_type_impl (std::uint64_t msb_id, std::uint64_t lsb_id,
                     id_type_management t)
               : gid_type(msb_id, lsb_id), count_(0), type_(t)
             {}
@@ -744,7 +743,9 @@ namespace hpx { namespace naming
 
             // serialization
             void save(serialization::output_archive& ar, unsigned) const;
+
             void load(serialization::input_archive& ar, unsigned);
+
             HPX_SERIALIZATION_SPLIT_MEMBER()
 
         private:
@@ -771,7 +772,7 @@ namespace hpx { namespace naming
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline std::ostream& operator<< (std::ostream& os, id_type const& id)
+    inline std::ostream& operator<<(std::ostream& os, id_type const& id)
     {
         if (!id)
         {
@@ -788,20 +789,20 @@ namespace hpx { namespace naming
     // Handle conversion to/from locality_id
     // FIXME: these names are confusing, 'id' appears in identifiers far too
     // frequently.
-    inline id_type get_id_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
+    inline id_type get_id_from_locality_id(std::uint32_t locality_id) HPX_SUPER_PURE;
 
-    inline id_type get_id_from_locality_id(boost::uint32_t locality_id)
+    inline id_type get_id_from_locality_id(std::uint32_t locality_id)
     {
         return id_type(
-            boost::uint64_t(locality_id+1) << gid_type::locality_id_shift,
+            std::uint64_t(locality_id+1) << gid_type::locality_id_shift,
             0, id_type::unmanaged);
     }
 
-    inline boost::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
+    inline std::uint32_t get_locality_id_from_id(id_type const& id) HPX_PURE;
 
-    inline boost::uint32_t get_locality_id_from_id(id_type const& id)
+    inline std::uint32_t get_locality_id_from_id(id_type const& id)
     {
-        return boost::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
+        return std::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
     }
 
     inline id_type get_locality_from_id(id_type const& id)
@@ -889,8 +890,8 @@ namespace std
 
         result_type operator()(argument_type const& gid) const
         {
-            result_type const h1 (std::hash<boost::uint64_t>()(gid.get_lsb()));
-            result_type const h2 (std::hash<boost::uint64_t>()(gid.get_msb()));
+            result_type const h1 (std::hash<std::uint64_t>()(gid.get_lsb()));
+            result_type const h2 (std::hash<std::uint64_t>()(gid.get_msb()));
             return h1 ^ (h2 << 1);
         }
     };
@@ -898,5 +899,4 @@ namespace std
 
 #include <hpx/config/warnings_suffix.hpp>
 
-#endif
-
+#endif /*HPX_RUNTIME_NAMING_NAME_HPP*/

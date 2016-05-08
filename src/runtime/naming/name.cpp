@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/runtime/naming/name.hpp>
+
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -22,10 +22,10 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <hpx/traits/is_bitwise_serializable.hpp>
+#include <boost/io/ios_state.hpp>
 
-#include <boost/mpl/bool.hpp>
-
+#include <iomanip>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -613,7 +613,7 @@ namespace hpx { namespace naming
         return gid_type(msb, lsb);
     }
 
-    std::ostream& operator<< (std::ostream& os, gid_type const& id)
+    std::ostream& operator<<(std::ostream& os, gid_type const& id)
     {
         boost::io::ios_flags_saver ifs(os);
         if (id != naming::invalid_gid)
